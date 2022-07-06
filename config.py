@@ -75,9 +75,11 @@ class Config(ConfigNode):
 
     default_config_name: str = "config.yml"
 
-    def __init__(self, config_path: Optional[Path] = None):
+    def __init__(self, config_path: Optional[str] = None):
         self.config_path = (
-            config_path if config_path is not None else self.get_default_config()
+            self.rec_find_config(config_path, Path(__file__).parent)
+            if config_path is not None
+            else self.get_default_config()
         )
 
         with open(self.config_path, "r") as f:
@@ -85,21 +87,22 @@ class Config(ConfigNode):
 
         super().__init__(self.data)
 
-    def get_default_config(self, curr_dir: Optional[Path] = None):
+    def get_default_config(self):
+        return self.rec_find_config(self.default_config_name, Path(__file__).parent)
+
+
+    def rec_find_config(self, config_name: str, curr_dir: Path):
         if str(curr_dir) == "/":
             raise FileNotFoundError(
-                f"Could not find a valid {self.default_config_name}."
+                f"Could not find a valid {config_name}."
             )
 
-        if curr_dir is None:
-            curr_dir = Path(__file__)
-
         # Assumes config.yml is either in currdir or in a ancestor dir.
-        config_path = curr_dir / self.default_config_name
+        config_path = curr_dir / config_name
         if config_path.exists():
             return config_path
         else:
-            return self.get_default_config(curr_dir.parent)
+            return self.rec_find_config(config_name, curr_dir.parent)
 
     def print_config(self):
         pprint(self.data)
@@ -108,10 +111,10 @@ class Config(ConfigNode):
 __CONFIG: dict = {}
 
 
-def get_config(config_path: Optional[str] = None) -> Config:
+def get_config(config_name: Optional[str] = None) -> Config:
     global __CONFIG
 
-    if config_path not in __CONFIG or __CONFIG[config_path] is None:
-        __CONFIG[config_path] = Config(None if config_path is None else Path(config_path))
+    if config_name not in __CONFIG or __CONFIG[config_name] is None:
+        __CONFIG[config_name] = Config(None if config_name is None else config_name)
 
-    return __CONFIG[config_path]
+    return __CONFIG[config_name]
