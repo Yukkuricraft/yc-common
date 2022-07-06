@@ -57,6 +57,17 @@ class ConfigNode:
             else:
                 self.data[k] = None
 
+    def as_dict(self):
+        rtn_dict = {}
+
+        for key, value in self.data.items():
+            if type(value) == ConfigNode:
+                rtn_dict[key] = value.as_dict()
+            else:
+                rtn_dict[key] = value
+
+        return rtn_dict
+
 
 class Config(ConfigNode):
     data: Dict
