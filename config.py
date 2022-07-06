@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import yaml  # type: ignore
-from pprint import pprint
+from pprint import pprint, pformat
 from pathlib import Path
 
 from typing import Optional, Dict, List, Tuple
@@ -21,12 +21,17 @@ class ConfigNode:
         return item in self.data
 
     def __str__(self):
-        rtn = "{"
-        for k, v in self.data.items():
-            rtn += f"{k}: {v}, "
-        rtn += "}"
+        lines = ["",]
+        for key, val in self.data.items():
+            if type(val) in [dict, list]:
+                val_str = pformat(val)
+            else:
+                val_str = val
+            lines += '!{}: ?{}'.format(key, val_str).split('\n')
+        return '\n    '.join(lines)
 
-        return rtn
+    def __repr__(self):
+        return self.__str__()
 
     def listnodes(self) -> List[str]:
         return list(self.data.keys())
@@ -49,6 +54,8 @@ class ConfigNode:
                 self.data[k] = v
             elif v is not None:
                 self.data[k] = ConfigNode(dict(v))
+            else:
+                self.data[k] = None
 
 
 class Config(ConfigNode):
@@ -83,7 +90,7 @@ class Config(ConfigNode):
         else:
             return self.get_default_config(curr_dir.parent)
 
-    def printconfig(self):
+    def print_config(self):
         pprint(self.data)
 
 
