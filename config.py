@@ -94,13 +94,13 @@ class Config(ConfigNode):
         pprint(self.data)
 
 
-__CONFIG = None
+__CONFIG: dict = {}
 
 
 def get_config(config_path: Optional[str] = None) -> Config:
     global __CONFIG
 
-    if __CONFIG is None:
-        __CONFIG = Config(None if config_path is None else Path(config_path))
+    if config_path not in __CONFIG or __CONFIG[config_path] is None:
+        __CONFIG[config_path] = Config(None if config_path is None else Path(config_path))
 
-    return __CONFIG
+    return __CONFIG[config_path]
