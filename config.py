@@ -27,7 +27,7 @@ class ConfigNode:
                 val_str = pformat(val)
             else:
                 val_str = val
-            lines += '!{}: ?{}'.format(key, val_str).split('\n')
+            lines += '{}: {}'.format(key, val_str).split('\n')
         return '\n    '.join(lines)
 
     def __repr__(self):
