@@ -55,7 +55,7 @@ class Config(ConfigNode):
     data: Dict
     config_path: Path
 
-    default_config_name: str = "patchouli_config.yml"
+    default_config_name: str = "config.yml"
 
     def __init__(self, config_path: Optional[Path] = None):
         self.config_path = (
