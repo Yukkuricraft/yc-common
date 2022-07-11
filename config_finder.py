@@ -10,15 +10,15 @@ class ConfigFinder:
 
     default_config_name: str = "config.yml"
 
-    def __init__(self, config_path: Optional[str] = None):
-        self.config_path = (
-            self.rec_find_config(config_path, Path(__file__).parent)
-            if config_path is not None
-            else self.get_default_config()
+    def __init__(
+        self, config_name: Optional[str] = None, config_path: Optional[Path] = None
+    ):
+        config_name = (
+            config_name if config_name is not None else self.default_config_name
         )
+        config_path = config_path if config_path is not None else Path(__file__).parent
 
-    def get_default_config(self):
-        return self.rec_find_config(self.default_config_name, Path(__file__).parent)
+        self.config_path = self.rec_find_config(config_name, config_path)
 
     def rec_find_config(self, config_name: str, curr_dir: Path):
         if str(curr_dir) == "/":

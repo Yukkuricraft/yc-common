@@ -2,14 +2,15 @@
 
 from typing import Dict, Optional
 from pathlib import Path
+from pprint import pprint
 
-import yaml  # type: ignore
+import tomllib  # type: ignore
 
 from src.common.config_node import ConfigNode
 from src.common.config_finder import ConfigFinder
 
 
-class YamlConfig(ConfigNode):
+class TomlConfig(ConfigNode):
     data: Dict
     config_path: Path
 
@@ -19,7 +20,7 @@ class YamlConfig(ConfigNode):
         self.config_path = ConfigFinder(config_path, base_path).config_path
 
         with open(self.config_path, "r") as f:
-            self.data = yaml.safe_load(f)
+            self.data = tomllib.loads(f.read())
 
         super().__init__(self.data)
 
