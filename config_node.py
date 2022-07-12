@@ -7,6 +7,8 @@ from typing import List, Tuple, Dict
 class ConfigNode:
     data: Dict
 
+    # TODO: Handle hyphenated dict keys? Should we auto coalesce?
+
     def __getattr__(self, name):
         rtn = self.data[name]
         return rtn
