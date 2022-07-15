@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from pathlib import Path
 from pprint import pprint
 
-import tomllib  # type: ignore
+import toml  # type: ignore
 
 from src.common.config_node import ConfigNode
 from src.common.config_finder import ConfigFinder
@@ -20,7 +20,7 @@ class TomlConfig(ConfigNode):
         self.config_path = ConfigFinder(config_path, base_path).config_path
 
         with open(self.config_path, "r") as f:
-            self.data = tomllib.loads(f.read())
+            self.data = toml.loads(f.read())
 
         super().__init__(self.data)
 

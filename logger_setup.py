@@ -10,3 +10,5 @@ ch.setFormatter(formatter)
 ch.setLevel(logging.DEBUG)
 
 logger.addHandler(ch)
+
+logger.info("LOGGING INITIALIZED")

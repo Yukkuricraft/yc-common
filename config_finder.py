@@ -4,6 +4,11 @@ from typing import Dict, Optional
 from pathlib import Path
 
 
+from logging import getLogger
+
+logger = getLogger(__name__)
+
+
 class ConfigFinder:
     data: Dict
     config_path: Path
@@ -21,6 +26,7 @@ class ConfigFinder:
         self.config_path = self.rec_find_config(config_name, config_path)
 
     def rec_find_config(self, config_name: str, curr_dir: Path):
+        logger.debug(f"{curr_dir} ?? {config_name}")
         if str(curr_dir) == "/":
             raise FileNotFoundError(f"Could not find a valid {config_name}.")
 
