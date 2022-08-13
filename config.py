@@ -18,12 +18,18 @@ __ENV_CONFIG: dict = {}
 
 
 def load_toml_config(
-    config_name: Optional[str] = None, base_path: Optional[Path] = None
+    config_name: Optional[str] = None,
+    base_path: Optional[Path] = None,
+    no_cache: bool = False,
 ) -> TomlConfig:
 
     global __TOML_CONFIG
 
-    if config_name not in __TOML_CONFIG or __TOML_CONFIG[config_name] is None:
+    if (
+        config_name not in __TOML_CONFIG
+        or __TOML_CONFIG[config_name] is None
+        or no_cache
+    ):
         __TOML_CONFIG[config_name] = TomlConfig(
             config_name,
             base_path,
@@ -33,11 +39,13 @@ def load_toml_config(
 
 
 def load_env_config(
-    config_name: Optional[str] = None, base_path: Optional[Path] = None
+    config_name: Optional[str] = None,
+    base_path: Optional[Path] = None,
+    no_cache: bool = False,
 ) -> Dict[str, str]:
     global __ENV_CONFIG
 
-    if config_name not in __ENV_CONFIG or __ENV_CONFIG[config_name] is None:
+    if config_name not in __ENV_CONFIG or __ENV_CONFIG[config_name] is None or no_cache:
         path = ConfigFinder(config_name, base_path).config_path
         config: Dict = {}
         with open(path, "r") as f:
@@ -55,11 +63,17 @@ def load_env_config(
 
 
 def load_yaml_config(
-    config_name: Optional[str] = None, base_path: Optional[Path] = None
+    config_name: Optional[str] = None,
+    base_path: Optional[Path] = None,
+    no_cache: bool = False,
 ) -> YamlConfig:
     global __YAML_CONFIG
 
-    if config_name not in __YAML_CONFIG or __YAML_CONFIG[config_name] is None:
+    if (
+        config_name not in __YAML_CONFIG
+        or __YAML_CONFIG[config_name] is None
+        or no_cache
+    ):
         __YAML_CONFIG[config_name] = YamlConfig(
             config_name,
             base_path,
