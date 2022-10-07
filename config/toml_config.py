@@ -6,8 +6,8 @@ from pprint import pprint
 
 import toml  # type: ignore
 
-from src.common.config_node import ConfigNode
-from src.common.config_finder import ConfigFinder
+from src.common.config.config_node import ConfigNode
+from src.common.config.config_finder import ConfigFinder
 
 
 class TomlConfig(ConfigNode):
