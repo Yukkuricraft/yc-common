@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 from pprint import pformat
-from typing import List, Tuple, Dict
-
+from typing import TextIO, List, Tuple, Dict
 
 class ConfigNode:
     data: Dict
@@ -10,11 +9,16 @@ class ConfigNode:
     # TODO: Handle hyphenated dict keys? Should we auto coalesce?
 
     def __getattr__(self, name):
-        rtn = self.data[name]
-        return rtn
+        if name in self.data:
+            return self.data[name]
+        else:
+            return ConfigNode({})
 
     def __getitem__(self, name):
-        return self.data[name]
+        if name in self.data:
+            return self.data[name]
+        else:
+            return ConfigNode({})
 
     def __contains__(self, item):
         return item in self.data
@@ -68,3 +72,7 @@ class ConfigNode:
                 rtn_dict[key] = value
 
         return rtn_dict
+
+    @staticmethod
+    def write_cb(f: TextIO, config: Dict):
+        raise NotImplementedError("Called write_cb on a subclass that hasn't overwritten it!")
