@@ -17,6 +17,7 @@ __TOML_CONFIG: dict = {}
 __YAML_CONFIG: dict = {}
 __ENV_CONFIG: dict = {}
 
+
 def load_toml_config(
     config_name: Optional[str] = None,
     base_path: Optional[Path] = None,
@@ -46,10 +47,7 @@ def load_env_config(
     global __ENV_CONFIG
 
     if config_name not in __ENV_CONFIG or __ENV_CONFIG[config_name] is None or no_cache:
-        __ENV_CONFIG[config_name] = EnvConfig(
-            config_name,
-            base_path
-        )
+        __ENV_CONFIG[config_name] = EnvConfig(config_name, base_path)
 
     return __ENV_CONFIG[config_name]
 

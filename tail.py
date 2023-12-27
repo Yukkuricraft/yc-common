@@ -10,6 +10,7 @@ IN_MODIFY = 2
 IN_DELETE_SELF = 1024
 IN_MOVE_SELF = 2048
 
+
 def follow(filename, blocksize=8192):
     """
     Monitors the file, and yields bytes objects.
@@ -39,11 +40,13 @@ def follow(filename, blocksize=8192):
             if mask & stop_mask:
                 break
 
+
 LIBC = ctypes.CDLL("libc.so.6")
 
 
 class INotify:
-    """ Ultra-lightweight inotify class. """
+    """Ultra-lightweight inotify class."""
+
     def __init__(self):
         self.fd = LIBC.inotify_init()
         if self.fd < 0:
@@ -57,7 +60,7 @@ class INotify:
         self.close()
 
     def close(self):
-        """ Frees the associated resources. """
+        """Frees the associated resources."""
         os.close(self.fd)
 
     def next_event(self):

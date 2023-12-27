@@ -5,6 +5,7 @@ from pathlib import Path
 from pprint import pprint
 
 import yaml  # type: ignore
+
 yaml.SafeDumper.add_representer(
     type(None),
     lambda dumper, value: dumper.represent_scalar("tag:yaml.org,2002:null", ""),

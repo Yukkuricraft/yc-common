@@ -3,6 +3,7 @@
 from pprint import pformat
 from typing import TextIO, List, Tuple, Dict
 
+
 class ConfigNode:
     data: Dict
 
@@ -75,4 +76,6 @@ class ConfigNode:
 
     @staticmethod
     def write_cb(f: TextIO, config: Dict):
-        raise NotImplementedError("Called write_cb on a subclass that hasn't overwritten it!")
+        raise NotImplementedError(
+            "Called write_cb on a subclass that hasn't overwritten it!"
+        )

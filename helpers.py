@@ -4,9 +4,10 @@ from typing import Optional
 
 from src.common.logger_setup import logger
 
+
 def recursive_chown(path, uid: Optional[int] = None, gid: Optional[int] = None):
     if uid is None and gid is None:
-      raise ValueError(f"You must provide a UID, GID, or both but not")
+        raise ValueError(f"You must provide a UID, GID, or both but not")
 
     logger.info(">> RECURSIVELY CHOWNING ")
     logger.info(path)
@@ -15,6 +16,7 @@ def recursive_chown(path, uid: Optional[int] = None, gid: Optional[int] = None):
         shutil.chown(dirpath, uid, gid)
         for filename in filenames:
             shutil.chown(os.path.join(dirpath, filename), uid, gid)
+
 
 def recursive_chmod(path, mode: int):
     # Should really validate mode.

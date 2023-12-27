@@ -27,7 +27,9 @@ class EnvConfig(ConfigNode):
                     continue
                 split = line.split("=")
                 key = split[0]
-                val = "=".join(split[1:]) # Just incase there were any ='s in the vals...? Is that even valid syntax?
+                val = "=".join(
+                    split[1:]
+                )  # Just incase there were any ='s in the vals...? Is that even valid syntax?
 
                 self.data[key] = val
 
@@ -56,4 +58,4 @@ class EnvConfig(ConfigNode):
             if quote:
                 f.write(f'{key}="{value}"\n'.encode("utf8"))
             else:
-                f.write(f'{key}={value}\n'.encode("utf8"))
+                f.write(f"{key}={value}\n".encode("utf8"))

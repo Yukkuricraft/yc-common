@@ -23,10 +23,7 @@ class ServerPaths:
         Returns:
             Path: Generated files path
         """
-        return (
-            REPO_ROOT_PATH
-            / "gen"
-        )
+        return REPO_ROOT_PATH / "gen"
 
     @staticmethod
     def get_env_toml_config_dir_path() -> Path:
@@ -40,10 +37,7 @@ class ServerPaths:
         Returns:
             Path: Dir path where we keep our env tomls
         """
-        return (
-            REPO_ROOT_PATH
-            / "env"
-        )
+        return REPO_ROOT_PATH / "env"
 
     ## Base data path based directory helpers
 
@@ -59,12 +53,7 @@ class ServerPaths:
         Returns:
             Path: Base data path for `env`
         """
-        return (
-            BASE_DATA_PATH
-            / "env"
-            / env
-        )
-
+        return BASE_DATA_PATH / "env" / env
 
     @staticmethod
     def get_env_default_configs_path(env: str) -> Path:
@@ -80,7 +69,6 @@ class ServerPaths:
         """
         return ServerPaths.get_env_data_path(env) / "defaultconfigs"
 
-
     @staticmethod
     def get_env_and_world_group_path(env: str, world_group: str) -> Path:
         """Get the data path for a specific `env` and `world_group`.
@@ -94,13 +82,7 @@ class ServerPaths:
         Returns:
             Path: Data path for `env` and `world_group`
         """
-        return (
-            BASE_DATA_PATH
-            / "env"
-            / env
-            / world_group
-        )
-
+        return BASE_DATA_PATH / "env" / env / world_group
 
     @staticmethod
     def get_env_and_world_group_configs_path(env: str, world_group: str) -> Path:
@@ -116,7 +98,6 @@ class ServerPaths:
             Path: Config path
         """
         return ServerPaths.get_env_and_world_group_path(env, world_group) / "configs"
-
 
     MODS_FILE_DIR = "mods"
     MODS_CONFIG_DIR = "mods"
@@ -142,14 +123,25 @@ class ServerPaths:
             Path: Config path
         """
         if config_type == ConfigType.MOD:
-            return ServerPaths.get_env_and_world_group_configs_path(env, world_group) / ServerPaths.MODS_CONFIG_DIR
+            return (
+                ServerPaths.get_env_and_world_group_configs_path(env, world_group)
+                / ServerPaths.MODS_CONFIG_DIR
+            )
         elif config_type == ConfigType.PLUGIN:
-            return ServerPaths.get_env_and_world_group_configs_path(env, world_group) / ServerPaths.PLUGINS_CONFIG_DIR
+            return (
+                ServerPaths.get_env_and_world_group_configs_path(env, world_group)
+                / ServerPaths.PLUGINS_CONFIG_DIR
+            )
         elif config_type == ConfigType.SERVER:
-            return ServerPaths.get_env_and_world_group_configs_path(env, world_group) / ServerPaths.WORLDS_CONFIG_DIR
+            return (
+                ServerPaths.get_env_and_world_group_configs_path(env, world_group)
+                / ServerPaths.WORLDS_CONFIG_DIR
+            )
         elif config_type == ConfigType.MOD_FILES:
-            return ServerPaths.get_env_and_world_group_path(env, world_group) / ServerPaths.MODS_FILE_DIR
-
+            return (
+                ServerPaths.get_env_and_world_group_path(env, world_group)
+                / ServerPaths.MODS_FILE_DIR
+            )
 
     ## Repo based specific filepath helpers
 
@@ -165,10 +157,7 @@ class ServerPaths:
         Returns:
             Path: Env toml config path
         """
-        return (
-            ServerPaths.get_env_toml_config_dir_path()
-            / f"{env}.toml"
-        )
+        return ServerPaths.get_env_toml_config_dir_path() / f"{env}.toml"
 
     @staticmethod
     def get_generated_docker_compose_path(env: str) -> Path:
@@ -182,11 +171,7 @@ class ServerPaths:
         Returns:
             Path: Generated `docker-compose-{env}.yml` path
         """
-        return (
-            ServerPaths.get_generated_configs_path(env)
-            / f"docker-compose-{env}.yml"
-        )
-
+        return ServerPaths.get_generated_configs_path(env) / f"docker-compose-{env}.yml"
 
     @staticmethod
     def get_generated_env_file_path(env: str) -> Path:
@@ -200,11 +185,7 @@ class ServerPaths:
         Returns:
             Path: Generated `{env}.env` path
         """
-        return (
-            ServerPaths.get_generated_configs_path(env)
-            / f"{env}.env"
-        )
-
+        return ServerPaths.get_generated_configs_path(env) / f"{env}.env"
 
     @staticmethod
     def get_generated_velocity_config_path(env: str) -> Path:
@@ -218,11 +199,7 @@ class ServerPaths:
         Returns:
             Path: Generated `velocity-{env}.toml` path
         """
-        return (
-            ServerPaths.get_generated_configs_path(env)
-            / f"velocity-{env}.toml"
-        )
-
+        return ServerPaths.get_generated_configs_path(env) / f"velocity-{env}.toml"
 
     ## Base data path based specific filepath helpers
 
@@ -243,7 +220,6 @@ class ServerPaths:
             ServerPaths.get_config_path(env, world_group, ConfigType.SERVER)
             / "server.properties"
         )
-
 
     @staticmethod
     def get_paper_global_yml_path(env: str, world_group: Optional[str] = None) -> Path:
@@ -267,8 +243,4 @@ class ServerPaths:
             else ServerPaths.get_env_default_configs_path(env) / "server"
         )
 
-        return (
-            base_path
-            / "config"
-            / "paper-global.yml"
-        )
+        return base_path / "config" / "paper-global.yml"
