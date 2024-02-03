@@ -1,5 +1,6 @@
 import re
 
+from typing import Dict
 from pprint import pformat
 from functools import total_ordering
 
@@ -20,7 +21,7 @@ class Env:
     ]
 
     fields_to_print = [
-        "config_as_dict",
+        "config",
         "name",
         "hostname",
         "description",
@@ -29,24 +30,24 @@ class Env:
         "enable_env_protection",
     ]
 
-    config: dict
+    _config: Dict
 
     @property
-    def config_as_dict(self):
-        return self.config.as_dict()
+    def config(self) -> Dict:
+        return self._config.as_dict()
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.env_str
 
     @property
-    def hostname(self):
-        general = self.config["general"] if "general" in self.config else {}
+    def hostname(self) -> str:
+        general = self._config["general"] if "general" in self._config else {}
         return general["hostname"] if "hostname" in general else ""
 
     @property
-    def description(self):
-        general = self.config["general"] if "general" in self.config else {}
+    def description(self) -> str:
+        general = self._config["general"] if "general" in self._config else {}
         return general["description"] if "description" in general else ""
 
     @property
@@ -63,7 +64,7 @@ class Env:
 
     @property
     def world_groups(self):
-        all_world_groups = self.config["world-groups"].get_or_default(
+        all_world_groups = self._config["world-groups"].get_or_default(
             "enabled_groups", []
         )
         filtered_world_groups = list(
@@ -73,7 +74,7 @@ class Env:
 
     @property
     def enable_env_protection(self):
-        general = self.config["general"] if "general" in self.config else {}
+        general = self._config["general"] if "general" in self._config else {}
         return (
             general["enable_env_protection"]
             if "enable_env_protection" in general
@@ -91,10 +92,10 @@ class Env:
         num = re.sub(r"\D", "", env_str)
         self.num = int(num) if num != "" else None
 
-        self.config = load_toml_config(
+        self._config = load_toml_config(
             ServerPaths.get_env_toml_config_path(self.env_str), no_cache=True
         )
-        self.envvars = self.config["runtime-environment-variables"]
+        self.envvars = self._config["runtime-environment-variables"]
 
     @classmethod
     def is_valid_env(cls, env_str: str) -> bool:
@@ -122,7 +123,7 @@ class Env:
         return "{" + ",".join(entries) + "}"
 
     def load_runtime_env_var(self, env_var: str):
-        return self.config["runtime-environment-variables"].get_or_default(env_var, "")
+        return self._config["runtime-environment-variables"].get_or_default(env_var, "")
 
     def to_json(self):
         return {field: getattr(self, field) for field in self.fields_to_print}
