@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.common.types import DataFileType
-from src.generator.constants import BASE_DATA_PATH, REPO_ROOT_PATH
+from src.common.constants import BASE_DATA_PATH, REPO_ROOT_PATH
 
 
 class ServerPaths:
@@ -94,6 +94,7 @@ class ServerPaths:
         return ServerPaths.get_env_and_world_group_path(env_str, world_group) / "configs"
 
     SERVER_ONLY_MODS_FILE_DIR = "server_only_mods"
+    CLIENT_AND_SERVER_MODS_FILE_DIR = "client_and_server_mods"
     MODS_FILE_DIR = "mods"
     MODS_CONFIG_DIR = "mods"
     PLUGINS_CONFIG_DIR = "plugins"
@@ -101,13 +102,21 @@ class ServerPaths:
 
     @staticmethod
     def get_data_files_path(env_str: str, world_group: str, data_file_type: DataFileType) -> Path:
-        """Get the configs path for a given `env`, `world_group`, and `data_file_type`.
+        """Get the file path for a given `env`, `world_group`, and `data_file_type`.
 
-        Normally:
-        - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/configs/{data_file_type_dirname}`
+        For configs
+        - Normally:
+            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/configs/{data_file_type_dirname}`
+        - Except for `DataFileType.MOD_FILES` because lol LuckPerms and generating files in the mod files directory:
+            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/mods`
 
-        Except for `DataFileType.MOD_FILES` because lol LuckPerms and generating files in the mod files directory:
-        - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/mods`
+        For mods
+        - We have three directories
+            - Server only mods
+            - Server + client mods
+            - "Mods folder"
+        - Place mods into first two directories. Third directory is cleared on each startup and the other two folders merged.
+            - This is to allow independently updating each folder without needing to remove old versions of mods.
 
         Args:
             env (env_str): Environment to get data files for
@@ -127,6 +136,11 @@ class ServerPaths:
             return (
                 ServerPaths.get_env_and_world_group_path(env_str, world_group)
                 / ServerPaths.SERVER_ONLY_MODS_FILE_DIR
+            )
+        elif data_file_type == DataFileType.CLIENT_AND_SERVER_MOD_FILES:
+            return (
+                ServerPaths.get_env_and_world_group_path(env_str, world_group)
+                / ServerPaths.CLIENT_AND_SERVER_MODS_FILE_DIR
             )
         elif data_file_type == DataFileType.MOD_CONFIGS:
             return (
