@@ -1,7 +1,11 @@
 import shutil
 import os
-from typing import Optional
 
+from typing import Optional, Dict, Callable
+from pathlib import Path
+
+from src.common.constants import DEFAULT_CHMOD_MODE
+from src.common.config.toml_config import TomlConfig
 from src.common.logger_setup import logger
 
 
@@ -28,3 +32,29 @@ def recursive_chmod(path, mode: int):
         os.chmod(dirpath, mode)
         for filename in filenames:
             os.chmod(os.path.join(dirpath, filename), mode)
+
+
+def write_config(
+    config_path: Path,
+    config: Dict,
+    header: str = "",
+    write_cb: Optional[Callable] = lambda f, config: TomlConfig.write_cb(f, config),
+):
+    """Writes config to path with optional header and custom write cb
+
+    Also applies `constants.DEFAULT_CHMOD_MODE`
+
+    Args:
+        config_path (Path): Path
+        config (Dict): Config represented as a dict
+        header (str, optional): Optional header. Defaults to "".
+        write_cb (Optional[Callable], optional): Defaults to a `toml_w.dump()`.
+    """
+
+    if not config_path.parent.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(config_path, "wb") as f:
+        f.write(header.encode("utf8"))
+        write_cb(f, config)
+    os.chmod(config_path, DEFAULT_CHMOD_MODE)

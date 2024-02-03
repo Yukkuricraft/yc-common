@@ -1,6 +1,6 @@
 import re
 
-from typing import Dict
+from typing import Dict, List
 from pprint import pformat
 from functools import total_ordering
 
@@ -8,6 +8,7 @@ from src.common.config import load_toml_config
 from src.common.config.config_node import ConfigNode
 from src.common.logger_setup import logger
 from src.common.paths import ServerPaths
+from src.common.types import ServerTypes
 
 class InvalidPortException(Exception):
     pass
@@ -30,7 +31,6 @@ class Env:
         "formatted",
         "enable_env_protection",
     ]
-
 
     _config_node: ConfigNode
 
@@ -85,7 +85,7 @@ class Env:
         return general["description"] if "description" in general else ""
 
     @property
-    def alias(self):
+    def alias(self) -> str:
         """A human-readable alias for the env (unlike 'env1', 'env2', etc)
 
         Returns:
@@ -94,7 +94,7 @@ class Env:
         return self.load_runtime_env_var("ENV_ALIAS")
 
     @property
-    def proxy_port(self):
+    def proxy_port(self) -> int:
         """Port that the Velocity proxy is running on.
 
         This is the port players connect to.
@@ -105,7 +105,16 @@ class Env:
         return self.load_runtime_env_var("VELOCITY_PORT")
 
     @property
-    def formatted(self):
+    def server_type(self) -> ServerTypes:
+        """Returns the Minecraft server type
+
+        Returns:
+            ServerType
+        """
+        return self.load_runtime_env_var("MC_TYPE")
+
+    @property
+    def formatted(self) -> str:
         """A formatted name/string for the environment.
 
         Current returns format of:
@@ -117,7 +126,7 @@ class Env:
         return f"Env {self.num} - {self.alias.capitalize()}"
 
     @property
-    def world_groups(self):
+    def world_groups(self) -> List[str]:
         """A list of enabled world groups
 
         Returns:
@@ -132,7 +141,7 @@ class Env:
         return filtered_world_groups
 
     @property
-    def enable_env_protection(self):
+    def enable_env_protection(self) -> bool:
         """Returns whether env protection is enabled for this env.
 
         Environments with env protection cannot be deleted. It's effectively a deletion protection flag.
@@ -146,6 +155,7 @@ class Env:
             if "enable_env_protection" in general
             else False
         )
+
 
     def __init__(self, env_str: str):
         if not self.is_valid_env(env_str):
