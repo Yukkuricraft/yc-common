@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import yaml  # type: ignore
-from pprint import pprint, pformat
 from pathlib import Path
 
-from typing import Optional, Dict, List, Tuple
+from typing import Optional
 
 from src.common.config.config_finder import ConfigFinder
 from src.common.config.config_node import ConfigNode
@@ -43,7 +42,7 @@ def load_env_config(
     config_name: Optional[str] = None,
     base_path: Optional[Path] = None,
     no_cache: bool = False,
-) -> Dict[str, str]:
+) -> EnvConfig:
     global __ENV_CONFIG
 
     if config_name not in __ENV_CONFIG or __ENV_CONFIG[config_name] is None or no_cache:

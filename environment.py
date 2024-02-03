@@ -5,6 +5,7 @@ from pprint import pformat
 from functools import total_ordering
 
 from src.common.config import load_toml_config
+from src.common.config.config_node import ConfigNode
 from src.common.logger_setup import logger
 from src.common.paths import ServerPaths
 
@@ -30,41 +31,99 @@ class Env:
         "enable_env_protection",
     ]
 
-    _config: Dict
+
+    _config_node: ConfigNode
+
+    @property
+    def config_node(self) -> ConfigNode:
+        """Returns a `ConfigNode` object representing the env config toml
+
+        Returns:
+            ConfigNode: Env config
+        """
+        return self._config_node
+    @config_node.setter
+    def config_node(self, node: ConfigNode):
+        self._config_node = node
 
     @property
     def config(self) -> Dict:
-        return self._config.as_dict()
+        """Returns a `Dict` representing the env config toml
+
+        Returns:
+            Dict: Env config
+        """
+        return self.config_node.as_dict()
 
     @property
     def name(self) -> str:
+        """Name of the env - usually in the format of env1, env2, env3, etc
+
+        Returns:
+            str: Name of env
+        """
         return self.env_str
 
     @property
     def hostname(self) -> str:
-        general = self._config["general"] if "general" in self._config else {}
+        """The hostname of the docker container
+
+        Returns:
+            str: Hostname
+        """
+        general = self.config_node["general"] if "general" in self.config_node else {}
         return general["hostname"] if "hostname" in general else ""
 
     @property
     def description(self) -> str:
-        general = self._config["general"] if "general" in self._config else {}
+        """Description in the env config toml
+
+        Returns:
+            str: Description of the environment
+        """
+        general = self.config_node["general"] if "general" in self.config_node else {}
         return general["description"] if "description" in general else ""
 
     @property
     def alias(self):
+        """A human-readable alias for the env (unlike 'env1', 'env2', etc)
+
+        Returns:
+            str: Alias
+        """
         return self.load_runtime_env_var("ENV_ALIAS")
 
     @property
     def proxy_port(self):
+        """Port that the Velocity proxy is running on.
+
+        This is the port players connect to.
+
+        Returns:
+            int: Port number
+        """
         return self.load_runtime_env_var("VELOCITY_PORT")
 
     @property
     def formatted(self):
+        """A formatted name/string for the environment.
+
+        Current returns format of:
+            "Env {number} - {CapitalizedAlias}"
+
+        Returns:
+            str: Formatted string identifying the env.
+        """
         return f"Env {self.num} - {self.alias.capitalize()}"
 
     @property
     def world_groups(self):
-        all_world_groups = self._config["world-groups"].get_or_default(
+        """A list of enabled world groups
+
+        Returns:
+            List[str]: A list of strings each representing a logical "world group".
+        """
+        all_world_groups = self.config_node["world-groups"].get_or_default(
             "enabled_groups", []
         )
         filtered_world_groups = list(
@@ -74,7 +133,14 @@ class Env:
 
     @property
     def enable_env_protection(self):
-        general = self._config["general"] if "general" in self._config else {}
+        """Returns whether env protection is enabled for this env.
+
+        Environments with env protection cannot be deleted. It's effectively a deletion protection flag.
+
+        Returns:
+            bool: Whether env is protected or not.
+        """
+        general = self.config_node["general"] if "general" in self.config_node else {}
         return (
             general["enable_env_protection"]
             if "enable_env_protection" in general
@@ -92,17 +158,35 @@ class Env:
         num = re.sub(r"\D", "", env_str)
         self.num = int(num) if num != "" else None
 
-        self._config = load_toml_config(
+        self.config_node = load_toml_config(
             ServerPaths.get_env_toml_config_path(self.env_str), no_cache=True
         )
-        self.envvars = self._config["runtime-environment-variables"]
+        self.envvars = self.config_node["runtime-environment-variables"]
 
     @classmethod
     def is_valid_env(cls, env_str: str) -> bool:
+        """Returns whether env identifier string is valid.
+
+        Currently we require a format of `env#` where # is any number. Eg, `env1`, `env99`, `env666`
+
+        Args:
+            env_str (str): Env name
+
+        Returns:
+            bool: Whether env name is valid.
+        """
         return re.match("env\d+", env_str) is not None
 
     @classmethod
     def env_exists(cls, env_str: str) -> bool:
+        """Checks if an env toml config with the matching env identifier string exists.
+
+        Args:
+            env_str (str): Env to check the config's existence for.
+
+        Returns:
+            bool: Whether env exists or not.
+        """
         return ServerPaths.get_env_toml_config_path(env_str).exists()
 
     def __eq__(self, other):
@@ -123,7 +207,7 @@ class Env:
         return "{" + ",".join(entries) + "}"
 
     def load_runtime_env_var(self, env_var: str):
-        return self._config["runtime-environment-variables"].get_or_default(env_var, "")
+        return self.config_node["runtime-environment-variables"].get_or_default(env_var, "")
 
     def to_json(self):
         return {field: getattr(self, field) for field in self.fields_to_print}
