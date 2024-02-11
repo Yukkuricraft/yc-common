@@ -4,6 +4,7 @@ import shutil
 
 from pathlib import Path
 
+from src.common.helpers import write_config
 from src.common.config import ConfigNode, load_yaml_config
 from src.common.config.config_finder import ConfigFinder
 from src.common.config.yaml_config import YamlConfig
@@ -55,7 +56,7 @@ class ServerTypeActions:
             "secret"
         ] = velocity_forwarding_secret
 
-        self.write_config(
+        write_config(
             paper_global_yml_path,
             paper_global_config,
             (
