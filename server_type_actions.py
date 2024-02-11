@@ -47,7 +47,8 @@ class ServerTypeActions:
         except FileNotFoundError:
             logger.info(f"Could not load {velocity_secret_path}")
 
-        paper_global_tpl = load_yaml_config(str(PAPER_GLOBAL_TEMPLATE_PATH), curr_dir)
+        # TODO: Need a cleaner way to handle different dir prefixes
+        paper_global_tpl = load_yaml_config(f"generator/{PAPER_GLOBAL_TEMPLATE_PATH}", curr_dir)
 
         paper_global_config = paper_global_tpl.as_dict()
         paper_global_config["proxies"]["velocity"][
