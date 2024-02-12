@@ -3,28 +3,38 @@ from enum import Enum
 
 
 class DataFileType(Enum):
-    PLUGIN_CONFIGS = "plugin"
-    MOD_CONFIGS = "mod"
-    SERVER_CONFIGS = "server"
+    PLUGIN_CONFIGS = "plugin_config"
+    MOD_CONFIGS = "mod_config"
+    SERVER_CONFIGS = "server_config"
 
-    MOD_FILES = "modfiles"
+    LOG_FILES = "log_files"
+    WORLD_FILES = "world_files"
+    PLUGIN_FILES = "plugin_files"
+    MOD_FILES = "mod_files"
     CLIENT_AND_SERVER_MOD_FILES = "client_and_server_mods"
     SERVER_ONLY_MOD_FILES = "server_only_mods"
 
     @staticmethod
     def from_str(label) -> "DataFileType":
-        if label == "plugin":
+        if label == "plugin_configs":
             return DataFileType.PLUGIN_CONFIGS
-        elif label == "mod":
+        elif label == "mod_configs":
             return DataFileType.MOD_CONFIGS
-        elif label == "modfiles":
+        elif label == "server_configs":
+            return DataFileType.SERVER_CONFIGS
+        elif label == "log_files":
+            return DataFileType.LOG_FILES
+        elif label == "world_files":
+            return DataFileType.WORLD_FILES
+        elif label == "plugin_files":
+            return DataFileType.PLUGIN_FILES
+        elif label == "mod_files":
             return DataFileType.MOD_FILES
         elif label == "client_and_server_mods":
             return DataFileType.CLIENT_AND_SERVER_MOD_FILES
         elif label == "server_only_mods":
             return DataFileType.SERVER_ONLY_MOD_FILES
-        elif label == "server":
-            return DataFileType.SERVER_CONFIGS
+
         else:
             raise NotImplementedError
 

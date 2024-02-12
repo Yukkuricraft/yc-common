@@ -6,8 +6,9 @@ from src.common.constants import BASE_DATA_PATH, REPO_ROOT_PATH
 
 
 class ServerPaths:
-
+    ##
     ## Repo based directory helpers
+    ##
 
     @staticmethod
     def get_generated_configs_path() -> Path:
@@ -33,7 +34,27 @@ class ServerPaths:
         """
         return REPO_ROOT_PATH / "env"
 
+    @staticmethod
+    def get_db_env_file_path() -> Path:
+        """Returns the path to the `db.env` used to instantiate the MySQL server auth
+
+        Returns:
+            Path: Path to `db.env`
+        """
+        return REPO_ROOT_PATH / "secrets" / "db.env"
+
+    @staticmethod
+    def get_pg_pw_file_path() -> Path:
+        """Returns the path to the `postgres_pw` file containing the default PG superuser password
+
+        Returns:
+            Path: Path to `postgres_pw`
+        """
+        return REPO_ROOT_PATH / "secrets" / "postgres_pw"
+
+    ##
     ## Base data path based directory helpers
+    ##
 
     @staticmethod
     def get_env_data_path(env_str: str) -> Path:
@@ -137,12 +158,35 @@ class ServerPaths:
         """
         return ServerPaths.get_env_and_world_group_path(env_str, world_group) / "configs"
 
-    SERVER_ONLY_MODS_FILE_DIR = "server_only_mods"
-    CLIENT_AND_SERVER_MODS_FILE_DIR = "client_and_server_mods"
-    MODS_FILE_DIR = "mods"
-    MODS_CONFIG_DIR = "mods"
-    PLUGINS_CONFIG_DIR = "plugins"
-    WORLDS_CONFIG_DIR = "server"
+    DATA_FILE_TYPE_TO_PATH_MAPPING = {
+        DataFileType.PLUGIN_CONFIGS: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "plugins"
+        ),
+        DataFileType.MOD_CONFIGS: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "mods"
+        ),
+        DataFileType.SERVER_CONFIGS: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "server"
+        ),
+        DataFileType.LOG_FILES: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "logs"
+        ),
+        DataFileType.WORLD_FILES: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "worlds"
+        ),
+        DataFileType.PLUGIN_FILES: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "plugins"
+        ),
+        DataFileType.MOD_FILES: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "mods"
+        ),
+        DataFileType.SERVER_ONLY_MOD_FILES: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "server_only_mods"
+        ),
+        DataFileType.CLIENT_AND_SERVER_MOD_FILES: (
+            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "client_and_server_mods"
+        ),
+    }
 
     @staticmethod
     def get_data_files_path(env_str: str, world_group: str, data_file_type: DataFileType) -> Path:
@@ -171,36 +215,11 @@ class ServerPaths:
             Path: Config path
         """
 
-        if data_file_type == DataFileType.MOD_FILES:
-            return (
-                ServerPaths.get_env_and_world_group_path(env_str, world_group)
-                / ServerPaths.MODS_FILE_DIR
-            )
-        elif data_file_type == DataFileType.SERVER_ONLY_MOD_FILES:
-            return (
-                ServerPaths.get_env_and_world_group_path(env_str, world_group)
-                / ServerPaths.SERVER_ONLY_MODS_FILE_DIR
-            )
-        elif data_file_type == DataFileType.CLIENT_AND_SERVER_MOD_FILES:
-            return (
-                ServerPaths.get_env_and_world_group_path(env_str, world_group)
-                / ServerPaths.CLIENT_AND_SERVER_MODS_FILE_DIR
-            )
-        elif data_file_type == DataFileType.MOD_CONFIGS:
-            return (
-                ServerPaths.get_env_and_world_group_configs_path(env_str, world_group)
-                / ServerPaths.MODS_CONFIG_DIR
-            )
-        elif data_file_type == DataFileType.PLUGIN_CONFIGS:
-            return (
-                ServerPaths.get_env_and_world_group_configs_path(env_str, world_group)
-                / ServerPaths.PLUGINS_CONFIG_DIR
-            )
-        elif data_file_type == DataFileType.SERVER_CONFIGS:
-            return (
-                ServerPaths.get_env_and_world_group_configs_path(env_str, world_group)
-                / ServerPaths.WORLDS_CONFIG_DIR
-            )
+        if data_file_type in ServerPaths.DATA_FILE_TYPE_TO_PATH_MAPPING:
+            return ServerPaths.DATA_FILE_TYPE_TO_PATH_MAPPING[data_file_type](env_str, world_group)
+        else:
+            raise RuntimeError(f"Got a data_file_type we don't support? Got: '{data_file_type}'")
+
 
 
     ## Repo based specific filepath helpers
