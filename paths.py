@@ -35,13 +35,22 @@ class ServerPaths:
         return REPO_ROOT_PATH / "env"
 
     @staticmethod
-    def get_db_env_file_path() -> Path:
-        """Returns the path to the `db.env` used to instantiate the MySQL server auth
+    def get_minecraft_db_env_file_path() -> Path:
+        """Returns the path to the `minecraft_db.env` used to instantiate the Minecraft MySQL server with
 
         Returns:
-            Path: Path to `db.env`
+            Path: Path to `minecraft_db.env`
         """
-        return REPO_ROOT_PATH / "secrets" / "db.env"
+        return REPO_ROOT_PATH / "secrets" / "minecraft_db.env"
+
+    @staticmethod
+    def get_api_db_env_file_path() -> Path:
+        """Returns the path to the `api_db.env` used to instantiate the API MySQL server with
+
+        Returns:
+            Path: Path to `api_db.env`
+        """
+        return REPO_ROOT_PATH / "secrets" / "api_db.env"
 
     @staticmethod
     def get_pg_pw_file_path() -> Path:
