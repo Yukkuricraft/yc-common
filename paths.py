@@ -39,7 +39,7 @@ class ServerPaths:
     def get_env_data_path(env_str: str) -> Path:
         """Get the base data path for a given `env`.
 
-        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}`
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft`
 
         Args:
             env (env_str): Environment
@@ -47,13 +47,13 @@ class ServerPaths:
         Returns:
             Path: Base data path for `env`
         """
-        return BASE_DATA_PATH / "env" / env_str
+        return BASE_DATA_PATH / "env" / env_str / "minecraft"
 
     @staticmethod
     def get_env_default_configs_path(env_str: str) -> Path:
         """Get the default configs path for a given `env`.
 
-        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/defaultconfigs`
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultconfigs`
 
         Args:
             env (env_str): Environment
@@ -67,7 +67,7 @@ class ServerPaths:
     def get_env_and_world_group_path(env_str: str, world_group: str) -> Path:
         """Get the data path for a specific `env` and `world_group`.
 
-        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}`
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}`
 
         Args:
             env (env_str): Environment
@@ -82,7 +82,7 @@ class ServerPaths:
     def get_env_and_world_group_configs_path(env_str: str, world_group: str) -> Path:
         """Get the config data path for a specific `env` and `world_group`.
 
-        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/configs`
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs`
 
         Args:
             env (env_str): Environment
@@ -106,9 +106,9 @@ class ServerPaths:
 
         For configs
         - Normally:
-            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/configs/{data_file_type_dirname}`
+            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/{data_file_type_dirname}`
         - Except for `DataFileType.MOD_FILES` because lol LuckPerms and generating files in the mod files directory:
-            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/mods`
+            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/mods`
 
         For mods
         - We have three directories
@@ -223,7 +223,7 @@ class ServerPaths:
     def get_server_properties_path(env_str: str, world_group: str) -> Path:
         """Returns the `server.properties` path for a given `env` and `world_group`
 
-        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/configs/server/server.properties`
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/server/server.properties`
 
         Args:
             env (env_str): Environment to get properties for
@@ -242,9 +242,9 @@ class ServerPaths:
         """Returns the `paper-global.yml` path for a given `env` and optional `world_group`
 
         If `world_group` supplied:
-            Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/{world_group}/configs/server/config/paper-global.yml`
+            Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/server/config/paper-global.yml`
         otherwise:
-            Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/defaultconfigs/config/paper-global.yml`
+            Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultconfigs/config/paper-global.yml`
 
         Args:
             env (env_str): Environment to get yml for
