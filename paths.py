@@ -39,6 +39,50 @@ class ServerPaths:
     def get_env_data_path(env_str: str) -> Path:
         """Get the base data path for a given `env`.
 
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/`
+
+        Args:
+            env (env_str): Environment
+
+        Returns:
+            Path: Base data path for `env`
+        """
+        return BASE_DATA_PATH / "env" / env_str
+
+    @staticmethod
+    def get_mysql_env_data_path(env_str: str) -> Path:
+        """Get the base mysql data path for a given `env`.
+
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/mysql`
+
+        Args:
+            env (env_str): Environment
+
+        Returns:
+            Path: Base data path for `env`
+        """
+        return ServerPaths.get_env_data_path(env_str) / "mysql"
+
+
+    @staticmethod
+    def get_pg_env_data_path(env_str: str) -> Path:
+        """Get the base postgres data path for a given `env`.
+
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/pg`
+
+        Args:
+            env (env_str): Environment
+
+        Returns:
+            Path: Base data path for `env`
+        """
+        return ServerPaths.get_env_data_path(env_str) / "postgres"
+
+
+    @staticmethod
+    def get_mc_env_data_path(env_str: str) -> Path:
+        """Get the base minecraft data path for a given `env`.
+
         Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft`
 
         Args:
@@ -47,7 +91,7 @@ class ServerPaths:
         Returns:
             Path: Base data path for `env`
         """
-        return BASE_DATA_PATH / "env" / env_str / "minecraft"
+        return ServerPaths.get_env_data_path(env_str) / "minecraft"
 
     @staticmethod
     def get_env_default_configs_path(env_str: str) -> Path:
@@ -61,7 +105,7 @@ class ServerPaths:
         Returns:
             Path: Default configs path
         """
-        return ServerPaths.get_env_data_path(env_str) / "defaultconfigs"
+        return ServerPaths.get_mc_env_data_path(env_str) / "defaultconfigs"
 
     @staticmethod
     def get_env_and_world_group_path(env_str: str, world_group: str) -> Path:
@@ -76,7 +120,7 @@ class ServerPaths:
         Returns:
             Path: Data path for `env` and `world_group`
         """
-        return BASE_DATA_PATH / "env" / env_str / world_group
+        return ServerPaths.get_mc_env_data_path(env_str) / world_group
 
     @staticmethod
     def get_env_and_world_group_configs_path(env_str: str, world_group: str) -> Path:
