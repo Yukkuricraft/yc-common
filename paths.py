@@ -169,32 +169,35 @@ class ServerPaths:
 
     DATA_FILE_TYPE_TO_PATH_MAPPING = {
         DataFileType.PLUGIN_CONFIGS: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "plugins"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "plugins"
         ),
         DataFileType.MOD_CONFIGS: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "mods"
         ),
         DataFileType.SERVER_CONFIGS: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "server"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "server"
         ),
         DataFileType.LOG_FILES: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "logs"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "logs"
         ),
         DataFileType.WORLD_FILES: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "worlds"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "worlds"
         ),
         DataFileType.PLUGIN_FILES: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "plugins"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "plugins"
         ),
         DataFileType.MOD_FILES: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "mods"
         ),
         DataFileType.SERVER_ONLY_MOD_FILES: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "server_only_mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "server_only_mods"
         ),
         DataFileType.CLIENT_AND_SERVER_MOD_FILES: (
-            lambda env_str, world_group:ServerPaths.get_env_and_world_group_path(env_str, world_group) / "client_and_server_mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "client_and_server_mods"
         ),
+        DataFileType.CRASH_REPORTS: {
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "crash-reports"
+        }
     }
 
     @staticmethod

@@ -13,6 +13,7 @@ class DataFileType(Enum):
     MOD_FILES = "mod_files"
     CLIENT_AND_SERVER_MOD_FILES = "client_and_server_mods"
     SERVER_ONLY_MOD_FILES = "server_only_mods"
+    CRASH_REPORTS = "crash_reports"
 
     @staticmethod
     def from_str(label) -> "DataFileType":
@@ -34,7 +35,8 @@ class DataFileType(Enum):
             return DataFileType.CLIENT_AND_SERVER_MOD_FILES
         elif label == "server_only_mods":
             return DataFileType.SERVER_ONLY_MOD_FILES
-
+        elif label == "crash_reports":
+            return DataFileType.CRASH_REPORTS
         else:
             raise NotImplementedError
 
