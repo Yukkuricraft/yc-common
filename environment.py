@@ -10,11 +10,14 @@ from src.common.logger_setup import logger
 from src.common.paths import ServerPaths
 from src.common.types import ServerTypes
 
+
 class InvalidPortException(Exception):
     pass
 
+
 class InvalidEnvException(Exception):
     pass
+
 
 @total_ordering
 class Env:
@@ -42,6 +45,7 @@ class Env:
             ConfigNode: Env config
         """
         return self._config_node
+
     @config_node.setter
     def config_node(self, node: ConfigNode):
         self._config_node = node
@@ -71,8 +75,7 @@ class Env:
         Returns:
             str: Hostname
         """
-        general = self.config_node["general"] if "general" in self.config_node else {}
-        return general["hostname"] if "hostname" in general else ""
+        return self.config_node.general.get("hostname", "")
 
     @property
     def description(self) -> str:
@@ -81,8 +84,7 @@ class Env:
         Returns:
             str: Description of the environment
         """
-        general = self.config_node["general"] if "general" in self.config_node else {}
-        return general["description"] if "description" in general else ""
+        return self.config_node.general.get("description", "")
 
     @property
     def alias(self) -> str:
@@ -91,7 +93,7 @@ class Env:
         Returns:
             str: Alias
         """
-        return self.load_runtime_env_var("ENV_ALIAS")
+        return self.envvars.ENV_ALIAS
 
     @property
     def proxy_port(self) -> int:
@@ -102,7 +104,7 @@ class Env:
         Returns:
             int: Port number
         """
-        return self.load_runtime_env_var("VELOCITY_PORT")
+        return self.envvars.VELOCITY_PORT
 
     @property
     def server_type(self) -> ServerTypes:
@@ -111,7 +113,7 @@ class Env:
         Returns:
             ServerType
         """
-        return self.load_runtime_env_var("MC_TYPE")
+        return self.envvars.MC_TYPE
 
     @property
     def formatted(self) -> str:
@@ -132,9 +134,7 @@ class Env:
         Returns:
             List[str]: A list of strings each representing a logical "world group".
         """
-        all_world_groups = self.config_node["world-groups"].get_or_default(
-            "enabled_groups", []
-        )
+        all_world_groups = self.config_node.world_groups.get("enabled_groups", [])
         filtered_world_groups = list(
             filter(lambda w: w not in self.WORLDGROUP_NAME_BLOCKLIST, all_world_groups)
         )
@@ -149,13 +149,7 @@ class Env:
         Returns:
             bool: Whether env is protected or not.
         """
-        general = self.config_node["general"] if "general" in self.config_node else {}
-        return (
-            general["enable_env_protection"]
-            if "enable_env_protection" in general
-            else False
-        )
-
+        return self.config_node.general.get("enable_env_protection", False)
 
     def __init__(self, env_str: str):
         if not self.is_valid_env(env_str):
@@ -171,7 +165,7 @@ class Env:
         self.config_node = load_toml_config(
             ServerPaths.get_env_toml_config_path(self.env_str), no_cache=True
         )
-        self.envvars = self.config_node["runtime-environment-variables"]
+        self.envvars = self.config_node.runtime_environment_variables
 
     @classmethod
     def is_valid_env(cls, env_str: str) -> bool:
@@ -215,9 +209,6 @@ class Env:
             entries.append(f" {field}: '{pformat(getattr(self, field))}'")
 
         return "{" + ",".join(entries) + "}"
-
-    def load_runtime_env_var(self, env_var: str):
-        return self.config_node["runtime-environment-variables"].get_or_default(env_var, "")
 
     def to_json(self):
         return {field: getattr(self, field) for field in self.fields_to_print}

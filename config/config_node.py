@@ -10,8 +10,12 @@ class ConfigNode:
     # TODO: Handle hyphenated dict keys? Should we auto coalesce?
 
     def __getattr__(self, name):
+        hyphenated_name = name.replace("_", "-")
+
         if name in self.data:
             return self.data[name]
+        elif hyphenated_name in self.data:
+            return self.data[hyphenated_name]
         else:
             return ConfigNode({})
 
@@ -42,7 +46,7 @@ class ConfigNode:
     def listnodes(self) -> List[str]:
         return list(self.data.keys())
 
-    def get_or_default(self, name, default=None):
+    def get(self, name, default=None):
         if name not in self.data:
             return default
         return self.__getitem__(name)

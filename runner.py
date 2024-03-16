@@ -7,6 +7,7 @@ from typing import List, Optional, Dict, Tuple
 from src.common.logger_setup import logger
 from src.common.decorators import serialize_tuple_out_as_dict
 
+
 class Runner:
     @staticmethod
     @serialize_tuple_out_as_dict({"stdout": 0, "stderr": 1, "exit_code": 2})

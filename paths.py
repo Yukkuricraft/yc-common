@@ -93,7 +93,6 @@ class ServerPaths:
         """
         return ServerPaths.get_env_data_path(env_str) / "mysql"
 
-
     @staticmethod
     def get_pg_env_data_path(env_str: str) -> Path:
         """Get the base postgres data path for a given `env`.
@@ -107,7 +106,6 @@ class ServerPaths:
             Path: Base data path for `env`
         """
         return ServerPaths.get_env_data_path(env_str) / "postgres"
-
 
     @staticmethod
     def get_mc_env_data_path(env_str: str) -> Path:
@@ -165,43 +163,77 @@ class ServerPaths:
         Returns:
             Path: Config path
         """
-        return ServerPaths.get_env_and_world_group_path(env_str, world_group) / "configs"
+        return (
+            ServerPaths.get_env_and_world_group_path(env_str, world_group) / "configs"
+        )
 
     DATA_FILE_TYPE_TO_PATH_MAPPING = {
         DataFileType.PLUGIN_CONFIGS: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "plugins"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(
+                env_str, world_group
+            )
+            / "plugins"
         ),
         DataFileType.MOD_CONFIGS: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(
+                env_str, world_group
+            )
+            / "mods"
         ),
         DataFileType.SERVER_CONFIGS: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(env_str, world_group) / "server"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(
+                env_str, world_group
+            )
+            / "server"
         ),
         DataFileType.LOG_FILES: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "logs"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
+                env_str, world_group
+            )
+            / "logs"
         ),
         DataFileType.WORLD_FILES: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "worlds"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
+                env_str, world_group
+            )
+            / "worlds"
         ),
         DataFileType.PLUGIN_FILES: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "plugins"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
+                env_str, world_group
+            )
+            / "plugins"
         ),
         DataFileType.MOD_FILES: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
+                env_str, world_group
+            )
+            / "mods"
         ),
         DataFileType.SERVER_ONLY_MOD_FILES: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "server_only_mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
+                env_str, world_group
+            )
+            / "server_only_mods"
         ),
         DataFileType.CLIENT_AND_SERVER_MOD_FILES: (
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "client_and_server_mods"
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
+                env_str, world_group
+            )
+            / "client_and_server_mods"
         ),
         DataFileType.CRASH_REPORTS: {
-            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(env_str, world_group) / "crash-reports"
-        }
+            lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
+                env_str, world_group
+            )
+            / "crash-reports"
+        },
     }
 
     @staticmethod
-    def get_data_files_path(env_str: str, world_group: str, data_file_type: DataFileType) -> Path:
+    def get_data_files_path(
+        env_str: str, world_group: str, data_file_type: DataFileType
+    ) -> Path:
         """Get the file path for a given `env`, `world_group`, and `data_file_type`.
 
         For configs
@@ -228,11 +260,13 @@ class ServerPaths:
         """
 
         if data_file_type in ServerPaths.DATA_FILE_TYPE_TO_PATH_MAPPING:
-            return ServerPaths.DATA_FILE_TYPE_TO_PATH_MAPPING[data_file_type](env_str, world_group)
+            return ServerPaths.DATA_FILE_TYPE_TO_PATH_MAPPING[data_file_type](
+                env_str, world_group
+            )
         else:
-            raise RuntimeError(f"Got a data_file_type we don't support? Got: '{data_file_type}'")
-
-
+            raise RuntimeError(
+                f"Got a data_file_type we don't support? Got: '{data_file_type}'"
+            )
 
     ## Repo based specific filepath helpers
 
@@ -262,7 +296,9 @@ class ServerPaths:
         Returns:
             Path: Generated `docker-compose-{env}.yml` path
         """
-        return ServerPaths.get_generated_configs_path() / f"docker-compose-{env_str}.yml"
+        return (
+            ServerPaths.get_generated_configs_path() / f"docker-compose-{env_str}.yml"
+        )
 
     @staticmethod
     def get_generated_env_file_path(env_str: str) -> Path:
@@ -308,12 +344,16 @@ class ServerPaths:
             Path: Server.properties path
         """
         return (
-            ServerPaths.get_data_files_path(env_str, world_group, DataFileType.SERVER_CONFIGS)
+            ServerPaths.get_data_files_path(
+                env_str, world_group, DataFileType.SERVER_CONFIGS
+            )
             / "server.properties"
         )
 
     @staticmethod
-    def get_paper_global_yml_path(env_str: str, world_group: Optional[str] = None) -> Path:
+    def get_paper_global_yml_path(
+        env_str: str, world_group: Optional[str] = None
+    ) -> Path:
         """Returns the `paper-global.yml` path for a given `env` and optional `world_group`
 
         If `world_group` supplied:
@@ -329,7 +369,9 @@ class ServerPaths:
             Path: paper-global.yml path
         """
         base_path = (
-            ServerPaths.get_data_files_path(env_str, world_group, DataFileType.SERVER_CONFIGS)
+            ServerPaths.get_data_files_path(
+                env_str, world_group, DataFileType.SERVER_CONFIGS
+            )
             if world_group is not None
             else ServerPaths.get_env_default_configs_path(env_str) / "server"
         )

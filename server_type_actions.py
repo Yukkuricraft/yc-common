@@ -17,6 +17,7 @@ from src.common.environment import Env
 
 from src.generator.constants import PAPER_GLOBAL_TEMPLATE_PATH
 
+
 class ServerTypeActions:
     server_root: Path
 
@@ -28,7 +29,9 @@ class ServerTypeActions:
         elif target_env.server_type in ["PAPER", "BUKKIT"]:
             self.write_paper_bukkit_configs(target_env)
         else:
-            logger.info(f"No special actions taken for serer type: {target_env.server_type}")
+            logger.info(
+                f"No special actions taken for serer type: {target_env.server_type}"
+            )
 
     def write_paper_bukkit_configs(self, target_env: Env):
         logger.info(f"Writing paper/bukkit configs for env: '{target_env.name}'")
@@ -49,7 +52,9 @@ class ServerTypeActions:
             logger.info(f"Could not load {velocity_secret_path}")
 
         # TODO: Need a cleaner way to handle different dir prefixes
-        paper_global_tpl = load_yaml_config(f"generator/{PAPER_GLOBAL_TEMPLATE_PATH}", curr_dir)
+        paper_global_tpl = load_yaml_config(
+            f"generator/{PAPER_GLOBAL_TEMPLATE_PATH}", curr_dir
+        )
 
         paper_global_config = paper_global_tpl.as_dict()
         paper_global_config["proxies"]["velocity"][
@@ -79,9 +84,15 @@ class ServerTypeActions:
         """
         logger.info(f"Merging fabric/forge prereq mods for env '{env.name}'")
         for world in env.world_groups:
-            server_mods_path = ServerPaths.get_data_files_path(env.name, world, DataFileType.SERVER_ONLY_MOD_FILES)
-            server_client_mods_path = ServerPaths.get_data_files_path(env.name, world, DataFileType.CLIENT_AND_SERVER_MOD_FILES)
-            mods_path = ServerPaths.get_data_files_path(env.name, world, DataFileType.MOD_FILES)
+            server_mods_path = ServerPaths.get_data_files_path(
+                env.name, world, DataFileType.SERVER_ONLY_MOD_FILES
+            )
+            server_client_mods_path = ServerPaths.get_data_files_path(
+                env.name, world, DataFileType.CLIENT_AND_SERVER_MOD_FILES
+            )
+            mods_path = ServerPaths.get_data_files_path(
+                env.name, world, DataFileType.MOD_FILES
+            )
 
             # Clear out and recreate mods directory
             if mods_path.exists():
@@ -90,12 +101,16 @@ class ServerTypeActions:
 
             for mods_to_merge_path in [server_mods_path, server_client_mods_path]:
                 if mods_to_merge_path.exists():
-                    logger.info(f"[{env.name}][{world}] Copying '{mods_to_merge_path}' => '{mods_path}'")
+                    logger.info(
+                        f"[{env.name}][{world}] Copying '{mods_to_merge_path}' => '{mods_path}'"
+                    )
                     shutil.copytree(
                         mods_to_merge_path,
                         mods_path,
                         dirs_exist_ok=True,
-                        symlinks=True, # Should we literally ever encounter symlinks lol
+                        symlinks=True,  # Should we literally ever encounter symlinks lol
                     )
                 else:
-                    logger.warning(f"Tried copying files from '{mods_to_merge_path}' but path did not exist!")
+                    logger.warning(
+                        f"Tried copying files from '{mods_to_merge_path}' but path did not exist!"
+                    )
