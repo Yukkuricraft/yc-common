@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 
 from pprint import pformat
-from typing import TextIO, List, Tuple, Dict
+from typing import TextIO, List, Tuple, Dict, Optional, Any
 
 
 class ConfigNode:
     data: Dict
 
-    # TODO: Handle hyphenated dict keys? Should we auto coalesce?
+    def __getattr__(self, name: str):
+        """Allows accessing config node vals using attribute accessors (foo.bar)
 
-    def __getattr__(self, name):
+        If `name` is not found, also tries a hpyhenated version converting from underscores.
+
+        Args:
+            name (str): Config node name
+
+        Returns:
+            Any | ConfigNode: Config node value
+        """
         hyphenated_name = name.replace("_", "-")
 
         if name in self.data:
@@ -46,7 +54,16 @@ class ConfigNode:
     def listnodes(self) -> List[str]:
         return list(self.data.keys())
 
-    def get(self, name, default=None):
+    def get(self, name: str, default: Optional[Any] = None):
+        """Returns the value at the config node `name`, or returns `default` if it doesn't exist.
+
+        Args:
+            name (str): The config node name to return
+            default (Any, optional): Value returned if `name` doesn't exist. Defaults to None.
+
+        Returns:
+            Any: Value of config node `name` or `default`
+        """
         if name not in self.data:
             return default
         return self.__getitem__(name)

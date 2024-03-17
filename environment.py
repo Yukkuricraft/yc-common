@@ -25,20 +25,20 @@ class Env:
         "defaultconfigs",  # :`) Ugly folder structures yay`
     ]
 
-    fields_to_print = [
-        "config",
-        "name",
-        "hostname",
-        "description",
-        "alias",
-        "formatted",
-        "enable_env_protection",
-    ]
+    fields_to_print = {
+        "config": lambda self: self.config.as_dict(),
+        "name": lambda self: self.name,
+        "hostname": lambda self: self.hostname,
+        "description": lambda self: self.description,
+        "alias": lambda self: self.alias,
+        "formatted": lambda self: self.formatted,
+        "enable_env_protection": lambda self: self.enable_env_protection,
+    }
 
     _config_node: ConfigNode
 
     @property
-    def config_node(self) -> ConfigNode:
+    def config(self) -> ConfigNode:
         """Returns a `ConfigNode` object representing the env config toml
 
         Returns:
@@ -46,18 +46,9 @@ class Env:
         """
         return self._config_node
 
-    @config_node.setter
-    def config_node(self, node: ConfigNode):
+    @config.setter
+    def config(self, node: ConfigNode):
         self._config_node = node
-
-    @property
-    def config(self) -> Dict:
-        """Returns a `Dict` representing the env config toml
-
-        Returns:
-            Dict: Env config
-        """
-        return self.config_node.as_dict()
 
     @property
     def name(self) -> str:
@@ -75,7 +66,7 @@ class Env:
         Returns:
             str: Hostname
         """
-        return self.config_node.general.get("hostname", "")
+        return self.config.general.get("hostname", "")
 
     @property
     def description(self) -> str:
@@ -84,7 +75,7 @@ class Env:
         Returns:
             str: Description of the environment
         """
-        return self.config_node.general.get("description", "")
+        return self.config.general.get("description", "")
 
     @property
     def alias(self) -> str:
@@ -93,7 +84,7 @@ class Env:
         Returns:
             str: Alias
         """
-        return self.envvars.ENV_ALIAS
+        return self.cluster_vars.get("ENV_ALIAS", "")
 
     @property
     def proxy_port(self) -> int:
@@ -104,7 +95,7 @@ class Env:
         Returns:
             int: Port number
         """
-        return self.envvars.VELOCITY_PORT
+        return self.cluster_vars.get("VELOCITY_PORT", "")
 
     @property
     def server_type(self) -> ServerTypes:
@@ -113,7 +104,7 @@ class Env:
         Returns:
             ServerType
         """
-        return self.envvars.MC_TYPE
+        return self.cluster_vars.get("MC_TYPE", "")
 
     @property
     def formatted(self) -> str:
@@ -134,7 +125,7 @@ class Env:
         Returns:
             List[str]: A list of strings each representing a logical "world group".
         """
-        all_world_groups = self.config_node.world_groups.get("enabled_groups", [])
+        all_world_groups = self.config.world_groups.get("enabled_groups", [])
         filtered_world_groups = list(
             filter(lambda w: w not in self.WORLDGROUP_NAME_BLOCKLIST, all_world_groups)
         )
@@ -149,7 +140,7 @@ class Env:
         Returns:
             bool: Whether env is protected or not.
         """
-        return self.config_node.general.get("enable_env_protection", False)
+        return self.config.general.get("enable_env_protection", False)
 
     def __init__(self, env_str: str):
         if not self.is_valid_env(env_str):
@@ -162,10 +153,10 @@ class Env:
         num = re.sub(r"\D", "", env_str)
         self.num = int(num) if num != "" else None
 
-        self.config_node = load_toml_config(
+        self.config = load_toml_config(
             ServerPaths.get_env_toml_config_path(self.env_str), no_cache=True
         )
-        self.envvars = self.config_node.runtime_environment_variables
+        self.cluster_vars = self.config.cluster_variables
 
     @classmethod
     def is_valid_env(cls, env_str: str) -> bool:
@@ -205,13 +196,13 @@ class Env:
 
     def __repr__(self):
         entries = []
-        for field in self.fields_to_print:
-            entries.append(f" {field}: '{pformat(getattr(self, field))}'")
+        for field, val_cb in self.fields_to_print.items():
+            entries.append(f" {field}: '{pformat(val_cb(self))}'")
 
         return "{" + ",".join(entries) + "}"
 
     def to_json(self):
-        return {field: getattr(self, field) for field in self.fields_to_print}
+        return {field: val_cb(self) for field, val_cb in self.fields_to_print.items()}
 
     def is_prod(self):
         # TODO: Maybe make an explicit flag? It'd end up effectively being an
