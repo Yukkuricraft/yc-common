@@ -49,9 +49,7 @@ class ServerTypeActions:
                     secret if len(secret) > 0 else velocity_forwarding_secret
                 )
         except FileNotFoundError:
-            log_exception(
-                message=f"Could not load {velocity_secret_path}"
-            )
+            log_exception(message=f"Could not load {velocity_secret_path}")
 
         # TODO: Need a cleaner way to handle different dir prefixes
         paper_global_tpl = load_yaml_config(

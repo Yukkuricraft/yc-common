@@ -13,7 +13,7 @@ class Runner:
     @serialize_tuple_out_as_dict({"stdout": 0, "stderr": 1, "exit_code": 2})
     def run(
         cmds: List[List[str]], env_vars: Optional[Dict[str, str]] = None
-    ) -> Dict[str, str|int]:
+    ) -> Dict[str, str | int]:
         """
         run() can take multiple "sets" of commands and pass the stdout
         from one command to the stdin of the next. Hence, cmds is a List[List[str]]

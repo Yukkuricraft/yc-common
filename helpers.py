@@ -72,7 +72,9 @@ def log_exception(
         tb = traceback.format_exc()
     else:
         tb = "".join(
-            traceback.format_exception(type(exception), exception, exception.__traceback__)
+            traceback.format_exception(
+                type(exception), exception, exception.__traceback__
+            )
         )
 
     logger.error("")

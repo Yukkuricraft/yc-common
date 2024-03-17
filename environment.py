@@ -166,7 +166,7 @@ class Env:
                 message="Failed to load environment toml config!",
                 data={
                     "env_str": self.env_str,
-                }
+                },
             )
             self.config = ConfigNode({})
 
