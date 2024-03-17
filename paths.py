@@ -222,12 +222,12 @@ class ServerPaths:
             )
             / "client_and_server_mods"
         ),
-        DataFileType.CRASH_REPORTS: {
+        DataFileType.CRASH_REPORTS: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
             / "crash-reports"
-        },
+        ),
     }
 
     @staticmethod

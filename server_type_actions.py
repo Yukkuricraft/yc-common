@@ -4,7 +4,7 @@ import shutil
 
 from pathlib import Path
 
-from src.common.helpers import write_config
+from src.common.helpers import log_exception, write_config
 from src.common.config import ConfigNode, load_yaml_config
 from src.common.config.config_finder import ConfigFinder
 from src.common.config.yaml_config import YamlConfig
@@ -49,7 +49,9 @@ class ServerTypeActions:
                     secret if len(secret) > 0 else velocity_forwarding_secret
                 )
         except FileNotFoundError:
-            logger.info(f"Could not load {velocity_secret_path}")
+            log_exception(
+                message=f"Could not load {velocity_secret_path}"
+            )
 
         # TODO: Need a cleaner way to handle different dir prefixes
         paper_global_tpl = load_yaml_config(

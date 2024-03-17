@@ -6,6 +6,7 @@ from functools import total_ordering
 
 from src.common.config import load_toml_config
 from src.common.config.config_node import ConfigNode
+from src.common.helpers import log_exception
 from src.common.logger_setup import logger
 from src.common.paths import ServerPaths
 from src.common.types import ServerTypes
@@ -151,12 +152,26 @@ class Env:
         self.env_str = env_str
 
         num = re.sub(r"\D", "", env_str)
-        self.num = int(num) if num != "" else None
+        try:
+            self.num = int(num)
+        except:
+            self.num = None
 
-        self.config = load_toml_config(
-            ServerPaths.get_env_toml_config_path(self.env_str), no_cache=True
-        )
+        try:
+            self.config = load_toml_config(
+                ServerPaths.get_env_toml_config_path(self.env_str), no_cache=True
+            )
+        except:
+            log_exception(
+                message="Failed to load environment toml config!",
+                data={
+                    "env_str": self.env_str,
+                }
+            )
+            self.config = ConfigNode({})
+
         self.cluster_vars = self.config.cluster_variables
+        logger.info("Env instantiated")
 
     @classmethod
     def is_valid_env(cls, env_str: str) -> bool:

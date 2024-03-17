@@ -1,7 +1,9 @@
 import shutil
+import traceback
 import os
 
-from typing import Optional, Dict, Callable
+from typing import Optional, Dict, Callable, Any
+from pprint import pformat
 from pathlib import Path
 
 from src.common.constants import DEFAULT_CHMOD_MODE
@@ -58,3 +60,31 @@ def write_config(
         f.write(header.encode("utf8"))
         write_cb(f, config)
     os.chmod(config_path, DEFAULT_CHMOD_MODE)
+
+
+def log_exception(
+    message: Optional[str] = None,
+    data: Optional[Any] = None,
+    exception: Optional[Exception] = None,
+):
+    tb = None
+    if exception is None:
+        tb = traceback.format_exc()
+    else:
+        tb = "".join(
+            traceback.format_exception(type(exception), exception, exception.__traceback__)
+        )
+
+    logger.error("")
+    logger.error("!! Caught Exception !!")
+    logger.error(tb)
+
+    if message is not None:
+        logger.error("")
+        logger.error("Message:")
+        logger.error(message)
+
+    if data is not None:
+        logger.error("")
+        logger.error("Data:")
+        logger.error(pformat(data))
