@@ -31,9 +31,6 @@ class YamlConfig(ConfigNode):
         if self.data == None:
             self.data = {}
 
-        logger.info(self.config_path)
-        logger.info(self.data)
-
         super().__init__(self.data)
 
     def print_config(self):

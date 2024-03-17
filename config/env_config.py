@@ -36,9 +36,6 @@ class EnvConfig(ConfigNode):
         if self.data == None:
             self.data = {}
 
-        logger.info(self.config_path)
-        logger.info(self.data)
-
         super().__init__(self.data)
 
     def print_config(self):
@@ -53,7 +50,7 @@ class EnvConfig(ConfigNode):
             config (dict): Config to dump
             quote (Optional[bool]) Whether to quote the config vals. Defaults to True
         """
-        logger.info(pformat(config))
+        logger.debug(pformat(config))
         for key, value in config.items():
             if quote:
                 f.write(f'{key}="{value}"\n'.encode("utf8"))
