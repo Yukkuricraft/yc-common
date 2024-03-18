@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.common.types import DataDirType
-from src.common.constants import BASE_DATA_PATH, REPO_ROOT_PATH
+from src.common.constants import BASE_DATA_PATH, REPO_ROOT_PATH, RESTIC_REPO_PATH
 
 
 class ServerPaths:
@@ -60,6 +60,24 @@ class ServerPaths:
             Path: Path to `postgres_pw`
         """
         return REPO_ROOT_PATH / "secrets" / "postgres_pw"
+
+    @staticmethod
+    def get_restic_password_file_path() -> Path:
+        """Returns the path to the `restic.password` file containing the restic repo pass
+
+        Returns:
+            Path: Path to `restic.password`
+        """
+        return REPO_ROOT_PATH / "secrets" / "restic.password"
+
+    @staticmethod
+    def get_rcon_password_file_path() -> Path:
+        """Returns the path to the `rcon.password` file containing the rcon repo pass
+
+        Returns:
+            Path: Path to `rcon.password`
+        """
+        return REPO_ROOT_PATH / "secrets" / "rcon.password"
 
     ##
     ## Base data path based directory helpers

@@ -67,6 +67,15 @@ def log_exception(
     data: Optional[Any] = None,
     exception: Optional[Exception] = None,
 ):
+    """Logging wrapper to be called inside `except:` blocks
+
+    Allows logging of additional info like custom message and arbitrary data
+
+    Args:
+        message (Optional[str]): Custom error message. Defults to None
+        data (Optional[Any]): Arbitrary data related to the exception to log. Defaults to None.
+        exception (Optional[Exception]): If provided, we will use this exception object with `traceback`. Otherwise we use the last raised exception.
+    """
     tb = None
     if exception is None:
         tb = traceback.format_exc()

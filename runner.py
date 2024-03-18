@@ -10,7 +10,6 @@ from src.common.decorators import serialize_tuple_out_as_dict
 
 class Runner:
     @staticmethod
-    @serialize_tuple_out_as_dict({"stdout": 0, "stderr": 1, "exit_code": 2})
     def run(
         cmds: List[List[str]], env_vars: Optional[Dict[str, str]] = None
     ) -> Dict[str, str | int]:
@@ -57,4 +56,8 @@ class Runner:
             if prev_stderr:
                 logger.warning(prev_stderr)
 
-        return prev_stdout, prev_stderr, proc.returncode
+        return {
+            "stdout": prev_stdout,
+            "stderr": prev_stderr,
+            "exit_code": proc.returncode,
+        }
