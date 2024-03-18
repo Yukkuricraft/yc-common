@@ -2,7 +2,7 @@ from typing import TypeVar
 from enum import Enum
 
 
-class DataFileType(Enum):
+class DataDirType(Enum):
     PLUGIN_CONFIGS = "plugin_config"
     MOD_CONFIGS = "mod_config"
     SERVER_CONFIGS = "server_config"
@@ -16,27 +16,27 @@ class DataFileType(Enum):
     CRASH_REPORTS = "crash_reports"
 
     @staticmethod
-    def from_str(label) -> "DataFileType":
+    def from_str(label) -> "DataDirType":
         if label == "plugin_configs":
-            return DataFileType.PLUGIN_CONFIGS
+            return DataDirType.PLUGIN_CONFIGS
         elif label == "mod_configs":
-            return DataFileType.MOD_CONFIGS
+            return DataDirType.MOD_CONFIGS
         elif label == "server_configs":
-            return DataFileType.SERVER_CONFIGS
+            return DataDirType.SERVER_CONFIGS
         elif label == "log_files":
-            return DataFileType.LOG_FILES
+            return DataDirType.LOG_FILES
         elif label == "world_files":
-            return DataFileType.WORLD_FILES
+            return DataDirType.WORLD_FILES
         elif label == "plugin_files":
-            return DataFileType.PLUGIN_FILES
+            return DataDirType.PLUGIN_FILES
         elif label == "mod_files":
-            return DataFileType.MOD_FILES
+            return DataDirType.MOD_FILES
         elif label == "client_and_server_mods":
-            return DataFileType.CLIENT_AND_SERVER_MOD_FILES
+            return DataDirType.CLIENT_AND_SERVER_MOD_FILES
         elif label == "server_only_mods":
-            return DataFileType.SERVER_ONLY_MOD_FILES
+            return DataDirType.SERVER_ONLY_MOD_FILES
         elif label == "crash_reports":
-            return DataFileType.CRASH_REPORTS
+            return DataDirType.CRASH_REPORTS
         else:
             raise NotImplementedError
 

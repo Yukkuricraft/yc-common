@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from src.common.types import DataFileType
+from src.common.types import DataDirType
 from src.common.constants import BASE_DATA_PATH, REPO_ROOT_PATH
 
 
@@ -167,62 +167,62 @@ class ServerPaths:
             ServerPaths.get_env_and_world_group_path(env_str, world_group) / "configs"
         )
 
-    DATA_FILE_TYPE_TO_PATH_MAPPING = {
-        DataFileType.PLUGIN_CONFIGS: (
+    DATA_DIR_TYPE_TO_PATH_MAPPING = {
+        DataDirType.PLUGIN_CONFIGS: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(
                 env_str, world_group
             )
             / "plugins"
         ),
-        DataFileType.MOD_CONFIGS: (
+        DataDirType.MOD_CONFIGS: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(
                 env_str, world_group
             )
             / "mods"
         ),
-        DataFileType.SERVER_CONFIGS: (
+        DataDirType.SERVER_CONFIGS: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_configs_path(
                 env_str, world_group
             )
             / "server"
         ),
-        DataFileType.LOG_FILES: (
+        DataDirType.LOG_FILES: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
             / "logs"
         ),
-        DataFileType.WORLD_FILES: (
+        DataDirType.WORLD_FILES: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
             / "worlds"
         ),
-        DataFileType.PLUGIN_FILES: (
+        DataDirType.PLUGIN_FILES: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
             / "plugins"
         ),
-        DataFileType.MOD_FILES: (
+        DataDirType.MOD_FILES: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
             / "mods"
         ),
-        DataFileType.SERVER_ONLY_MOD_FILES: (
+        DataDirType.SERVER_ONLY_MOD_FILES: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
             / "server_only_mods"
         ),
-        DataFileType.CLIENT_AND_SERVER_MOD_FILES: (
+        DataDirType.CLIENT_AND_SERVER_MOD_FILES: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
             / "client_and_server_mods"
         ),
-        DataFileType.CRASH_REPORTS: (
+        DataDirType.CRASH_REPORTS: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
@@ -231,41 +231,29 @@ class ServerPaths:
     }
 
     @staticmethod
-    def get_data_files_path(
-        env_str: str, world_group: str, data_file_type: DataFileType
+    def get_data_dir_path(
+        env_str: str, world_group: str, data_dir_type: DataDirType
     ) -> Path:
         """Get the file path for a given `env`, `world_group`, and `data_file_type`.
 
-        For configs
-        - Normally:
-            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/{data_file_type_dirname}`
-        - Except for `DataFileType.MOD_FILES` because lol LuckPerms and generating files in the mod files directory:
-            - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/mods`
-
-        For mods
-        - We have three directories
-            - Server only mods
-            - Server + client mods
-            - "Mods folder"
-        - Place mods into first two directories. Third directory is cleared on each startup and the other two folders merged.
-            - This is to allow independently updating each folder without needing to remove old versions of mods.
+        See `ServerPaths.DATA_DIR_TYPE_TO_PATH_MAPPING` for more details
 
         Args:
             env (env_str): Environment to get data files for
             world_group (str): World Group name. Eg, 'creative', 'survival', 'gensokyo'
-            data_file_type (DataFileType): Config type to return path for
+            data_dir_type (DataDirType): Config type to return path for
 
         Returns:
             Path: Config path
         """
 
-        if data_file_type in ServerPaths.DATA_FILE_TYPE_TO_PATH_MAPPING:
-            return ServerPaths.DATA_FILE_TYPE_TO_PATH_MAPPING[data_file_type](
+        if data_dir_type in ServerPaths.DATA_DIR_TYPE_TO_PATH_MAPPING:
+            return ServerPaths.DATA_DIR_TYPE_TO_PATH_MAPPING[data_dir_type](
                 env_str, world_group
             )
         else:
             raise RuntimeError(
-                f"Got a data_file_type we don't support? Got: '{data_file_type}'"
+                f"Got a data_dir_type we don't support? Got: '{data_dir_type}'"
             )
 
     ## Repo based specific filepath helpers
@@ -344,8 +332,8 @@ class ServerPaths:
             Path: Server.properties path
         """
         return (
-            ServerPaths.get_data_files_path(
-                env_str, world_group, DataFileType.SERVER_CONFIGS
+            ServerPaths.get_data_dir_path(
+                env_str, world_group, DataDirType.SERVER_CONFIGS
             )
             / "server.properties"
         )
@@ -369,8 +357,8 @@ class ServerPaths:
             Path: paper-global.yml path
         """
         base_path = (
-            ServerPaths.get_data_files_path(
-                env_str, world_group, DataFileType.SERVER_CONFIGS
+            ServerPaths.get_data_dir_path(
+                env_str, world_group, DataDirType.SERVER_CONFIGS
             )
             if world_group is not None
             else ServerPaths.get_env_default_configs_path(env_str) / "server"

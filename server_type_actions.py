@@ -9,7 +9,7 @@ from src.common.config import ConfigNode, load_yaml_config
 from src.common.config.config_finder import ConfigFinder
 from src.common.config.yaml_config import YamlConfig
 from src.common.constants import VELOCITY_FORWARDING_SECRET_PATH
-from src.common.types import DataFileType, ServerTypes
+from src.common.types import DataDirType, ServerTypes
 from src.common.paths import ServerPaths
 from src.common.logger_setup import logger
 
@@ -84,14 +84,14 @@ class ServerTypeActions:
         """
         logger.info(f"Merging fabric/forge prereq mods for env '{env.name}'")
         for world in env.world_groups:
-            server_mods_path = ServerPaths.get_data_files_path(
-                env.name, world, DataFileType.SERVER_ONLY_MOD_FILES
+            server_mods_path = ServerPaths.get_data_dir_path(
+                env.name, world, DataDirType.SERVER_ONLY_MOD_FILES
             )
-            server_client_mods_path = ServerPaths.get_data_files_path(
-                env.name, world, DataFileType.CLIENT_AND_SERVER_MOD_FILES
+            server_client_mods_path = ServerPaths.get_data_dir_path(
+                env.name, world, DataDirType.CLIENT_AND_SERVER_MOD_FILES
             )
-            mods_path = ServerPaths.get_data_files_path(
-                env.name, world, DataFileType.MOD_FILES
+            mods_path = ServerPaths.get_data_dir_path(
+                env.name, world, DataDirType.MOD_FILES
             )
 
             # Clear out and recreate mods directory
