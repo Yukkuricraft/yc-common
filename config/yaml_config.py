@@ -21,9 +21,9 @@ class YamlConfig(ConfigNode):
     config_path: Path
 
     def __init__(
-        self, config_path: Optional[str] = None, base_path: Optional[Path] = None
+        self, config_path: Path
     ):
-        self.config_path = ConfigFinder(config_path, base_path).config_path
+        self.config_path = config_path
 
         with open(self.config_path, "r") as f:
             self.data = yaml.safe_load(f)

@@ -35,27 +35,29 @@ class ServerTypeActions:
 
     def write_paper_bukkit_configs(self, target_env: Env):
         logger.info(f"Writing paper/bukkit configs for env: '{target_env.name}'")
-        paper_global_yml_path = ServerPaths.get_paper_global_yml_path(target_env.name)
+
         velocity_forwarding_secret = "CouldNotFindValidSecret?"
         curr_dir = Path(__file__).parent
-        velocity_secret_path = ConfigFinder(
-            str(VELOCITY_FORWARDING_SECRET_PATH), curr_dir
-        ).config_path
 
         try:
-            with open(velocity_secret_path, "r") as f:
+            with open(VELOCITY_FORWARDING_SECRET_PATH, "r") as f:
                 secret = f.read().strip()
                 velocity_forwarding_secret = (
                     secret if len(secret) > 0 else velocity_forwarding_secret
                 )
         except FileNotFoundError:
-            log_exception(message=f"Could not load {velocity_secret_path}")
+            log_exception(message=f"Could not load {VELOCITY_FORWARDING_SECRET_PATH}")
 
         # TODO: Need a cleaner way to handle different dir prefixes
-        paper_global_tpl = load_yaml_config(
-            f"generator/{PAPER_GLOBAL_TEMPLATE_PATH}", curr_dir
-        )
-
+        paper_global_yml_path = ServerPaths.get_paper_global_yml_path(target_env.name)
+        if not paper_global_yml_path.exists():
+            paper_global_tpl = load_yaml_config(
+                curr_dir.parent / "generator" / PAPER_GLOBAL_TEMPLATE_PATH
+            )
+        else:
+            paper_global_tpl = load_yaml_config(
+                str(paper_global_yml_path), "/"
+            )
         paper_global_config = paper_global_tpl.as_dict()
         paper_global_config["proxies"]["velocity"][
             "secret"

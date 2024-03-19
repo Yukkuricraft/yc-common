@@ -232,13 +232,13 @@ class ServerPaths:
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
-            / "server_only_mods"
+            / "server-only-mods"
         ),
         DataDirType.CLIENT_AND_SERVER_MOD_FILES: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
                 env_str, world_group
             )
-            / "client_and_server_mods"
+            / "client-and-server-mods"
         ),
         DataDirType.CRASH_REPORTS: (
             lambda env_str, world_group: ServerPaths.get_env_and_world_group_path(
