@@ -340,7 +340,10 @@ class ServerPaths:
     def get_server_configs_path(env_str: str, world_group: Optional[str]) -> Path:
         """_summary_
 
-        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/server`
+        If `world_group` is supplied:
+        - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/server`
+        Else:
+        - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultconfigs/server`
 
         Args:
             env_str (str): _description_
@@ -363,7 +366,10 @@ class ServerPaths:
     ) -> Path:
         """Returns the `server.properties` path for a given `env` and `world_group`
 
-        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/server/server.properties`
+        If `world_group` is supplied:
+        - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/server/server.properties`
+        Else:
+        - Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultconfigs/server/server.properties`
 
         Args:
             env (env_str): Environment to get properties for
@@ -385,7 +391,7 @@ class ServerPaths:
         If `world_group` supplied:
             Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/{world_group}/configs/server/config/bukkit.yml`
         otherwise:
-            Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultconfigs/config/bukkit.yml`
+            Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultconfigs/server/bukkit.yml`
 
         Args:
             env (env_str): Environment to get yml for
@@ -419,5 +425,5 @@ class ServerPaths:
         """
 
         return (
-            ServerPaths.get_server_configs_path(env_str, world_group) / "paper-global.yml"
+            ServerPaths.get_server_configs_path(env_str, world_group) / "config" / "paper-global.yml"
         )
