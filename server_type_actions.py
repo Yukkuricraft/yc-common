@@ -8,7 +8,7 @@ from src.common.helpers import log_exception, write_config
 from src.common.config import ConfigNode, load_yaml_config
 from src.common.config.config_finder import ConfigFinder
 from src.common.config.yaml_config import YamlConfig
-from src.common.constants import VELOCITY_FORWARDING_SECRET_PATH
+from src.common.constants import REPO_ROOT_PATH, VELOCITY_FORWARDING_SECRET_PATH
 from src.common.types import DataDirType, ServerTypes
 from src.common.paths import ServerPaths
 from src.common.logger_setup import logger
@@ -36,6 +36,10 @@ class ServerTypeActions:
     def write_paper_bukkit_configs(self, target_env: Env):
         logger.info(f"Writing paper/bukkit configs for env: '{target_env.name}'")
 
+        self.write_default_paper_global_yml_config(target_env)
+        self.write_default_bukkit_yml_config(target_env)
+
+    def write_default_paper_global_yml_config(self, target_env: Env):
         velocity_forwarding_secret = "CouldNotFindValidSecret?"
         curr_dir = Path(__file__).parent
 
@@ -51,6 +55,7 @@ class ServerTypeActions:
         # TODO: Need a cleaner way to handle different dir prefixes
         paper_global_yml_path = ServerPaths.get_paper_global_yml_path(target_env.name)
         if not paper_global_yml_path.exists():
+            # TODO: ServerPaths? Relies on a non-common const though. Do we move them all to common?
             paper_global_tpl = load_yaml_config(
                 curr_dir.parent / "generator" / PAPER_GLOBAL_TEMPLATE_PATH
             )
@@ -74,6 +79,28 @@ class ServerTypeActions:
             ),
             YamlConfig.write_cb,
         )
+
+    def write_default_bukkit_yml_config(self, target_env: Env):
+        """Writes the `bukkit.yml` file for a given target env
+
+        Args:
+            target_env (Env): Env to
+        """
+
+        # Because we don't actually dynamically inject any values into the template, don't do anything if file already exists.
+        # At best it's a no op, at worst we overwrite changes.
+        dest_bukkit_yml_path = ServerPaths.get_bukkit_yml_path(target_env.name)
+        if not dest_bukkit_yml_path.exists():
+            logger.info(f"Writing 'bukkit.yml' to 'defaultconfigs' for env: '{target_env.name}'")
+
+            # TODO: ServerPaths? Relies on a non-common const though. Do we move them all to common?
+            curr_dir = Path(__file__).parent
+            template_path = curr_dir.parent / "generator" / "templates" / "bukkit.tpl.yml"
+
+            shutil.copy(
+                template_path,
+                dest_bukkit_yml_path,
+            )
 
     def merge_fabric_forge_prereq_mods(self, env: Env):
         """Copies mods from the "server only" and "client + server" mods folders into the final "mods" folder.
