@@ -1,4 +1,5 @@
 #!/bin/env python3
+from pprint import pformat
 import requests
 import yaml  # type: ignore
 import shutil
@@ -118,22 +119,24 @@ class ServerTypeActions:
         """
 
         fabric_proxy_url = self.fabric_proxy_url_fmt.format(
-            mc_version=f'"{env.config.envvars.get("MC_VERSION", "no-mc-version-found")}"',
-            loader=f'"{env.config.envvars.get("MC_TYPE", "invalid-server-type").lower()}"',
+            mc_version=f'"{env.cluster_vars.get("MC_VERSION", "no-mc-version-found")}"',
+            loader=f'"{env.cluster_vars.get("MC_TYPE", "invalid-server-type").lower()}"',
         )
 
         filename = None
         mod_dl_url = None
         with requests.get(fabric_proxy_url) as r:
             resp = r.json()
+            logger.info(fabric_proxy_url)
+            logger.info(pformat(resp))
             if len(resp) == 0:
                 raise RuntimeError("Modrinth API returned no valid downloads for the FabricProxy-Lite mod!")
 
             project_version_data = resp[0]
-            if "files" not in project_version_data:
+            if "files" not in project_version_data or len(project_version_data["files"]) == 0:
                 raise RuntimeError("Got malformed response from Modrinth! Expected a 'files' field in the project version data!")
 
-            file_data = project_version_data["files"]
+            file_data = project_version_data["files"][0]
             if "url" not in file_data:
                 raise RuntimeError("Got malformed response from Modrinth! Expected a 'url' field in the project download file data!")
             if "filename" not in file_data:
@@ -145,5 +148,6 @@ class ServerTypeActions:
         if mod_dl_url is None:
             raise Exception("Somehow got here with a None mod download url!")
 
-        download_dest = ServerPaths.get()
-        urllib.request.urlretrieve(mod_dl_url, filename)
+        download_dest = ServerPaths.get_env_default_mods_path(env.name) / filename
+        logger.info(f">> Downloading from '{mod_dl_url}' to '{download_dest}'!")
+        urllib.request.urlretrieve(mod_dl_url, download_dest)

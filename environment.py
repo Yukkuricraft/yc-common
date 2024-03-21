@@ -23,6 +23,8 @@ class InvalidEnvException(Exception):
 @total_ordering
 class Env:
     WORLDGROUP_NAME_BLOCKLIST = [
+        "defaultplugins",
+        "defaultmods",
         "defaultconfigs",  # :`) Ugly folder structures yay`
     ]
 
