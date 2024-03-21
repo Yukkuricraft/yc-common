@@ -140,6 +140,34 @@ class ServerPaths:
         return ServerPaths.get_env_data_path(env_str) / "minecraft"
 
     @staticmethod
+    def get_env_default_plugins_path(env_str: str) -> Path:
+        """Get the default plugins path for a given `env`.
+
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultplugins`
+
+        Args:
+            env (env_str): Environment
+
+        Returns:
+            Path: Default plugins path
+        """
+        return ServerPaths.get_mc_env_data_path(env_str) / "defaultplugins"
+
+    @staticmethod
+    def get_env_default_mods_path(env_str: str) -> Path:
+        """Get the default mods path for a given `env`.
+
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/minecraft/defaultmods`
+
+        Args:
+            env (env_str): Environment
+
+        Returns:
+            Path: Default mods path
+        """
+        return ServerPaths.get_mc_env_data_path(env_str) / "defaultmods"
+
+    @staticmethod
     def get_env_default_configs_path(env_str: str) -> Path:
         """Get the default configs path for a given `env`.
 
