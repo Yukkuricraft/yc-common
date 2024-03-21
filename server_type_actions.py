@@ -1,8 +1,10 @@
 #!/bin/env python3
+import requests
 import yaml  # type: ignore
 import shutil
 
 from pathlib import Path
+import urllib.request
 
 from src.common.helpers import log_exception, write_config
 from src.common.config import ConfigNode, load_yaml_config
@@ -21,16 +23,21 @@ from src.generator.constants import PAPER_GLOBAL_TEMPLATE_PATH
 class ServerTypeActions:
     server_root: Path
 
-    def run(self, target_env: Env):
-        logger.info("Doing server type specific stuff?")
+    def perform_only_once_actions(self, target_env: Env):
+        """Performs ServerType based actions that are meant to be invoked only once, usually at env creation time.
+
+        Args:
+            target_env (Env): Env to run against
+        """
+        logger.info("Performing 'only once' server type actions")
 
         if target_env.server_type in ["FABRIC", "FORGE"]:
-            self.merge_fabric_forge_prereq_mods(target_env)
+            self.write_fabric_proxy_files(target_env)
         elif target_env.server_type in ["PAPER", "BUKKIT"]:
             self.write_paper_bukkit_configs(target_env)
         else:
             logger.info(
-                f"No special actions taken for serer type: {target_env.server_type}"
+                f"No special actions taken for server type: {target_env.server_type}"
             )
 
     def write_paper_bukkit_configs(self, target_env: Env):
@@ -102,44 +109,41 @@ class ServerTypeActions:
                 dest_bukkit_yml_path,
             )
 
-    def merge_fabric_forge_prereq_mods(self, env: Env):
-        """Copies mods from the "server only" and "client + server" mods folders into the final "mods" folder.
-
-        The user should place their mods in the "server only" and "client + server" mods folders.
-        The "mods" folder is cleared and recreated on each restart.
+    fabric_proxy_url_fmt = "https://api.modrinth.com/v2/project/8dI2tmqs/version?game_versions=[{mc_version}]&loaders=[{loader}]"
+    def write_fabric_proxy_files(self, env: Env):
+        """Downloads the appropriate Velocity/mcproxy related helper mods into the `server_only_mods` dir for `env`
 
         Args:
-            env (Env): Env to run for.
+            env (Env): Env to target
         """
-        logger.info(f"Merging fabric/forge prereq mods for env '{env.name}'")
-        for world in env.world_groups:
-            server_mods_path = ServerPaths.get_data_dir_path(
-                env.name, world, DataDirType.SERVER_ONLY_MOD_FILES
-            )
-            server_client_mods_path = ServerPaths.get_data_dir_path(
-                env.name, world, DataDirType.CLIENT_AND_SERVER_MOD_FILES
-            )
-            mods_path = ServerPaths.get_data_dir_path(
-                env.name, world, DataDirType.MOD_FILES
-            )
 
-            # Clear out and recreate mods directory
-            if mods_path.exists():
-                shutil.rmtree(mods_path)
-                mods_path.mkdir(parents=True)
+        fabric_proxy_url = self.fabric_proxy_url_fmt.format(
+            mc_version=f'"{env.config.envvars.get("MC_VERSION", "no-mc-version-found")}"',
+            loader=f'"{env.config.envvars.get("MC_TYPE", "invalid-server-type").lower()}"',
+        )
 
-            for mods_to_merge_path in [server_mods_path, server_client_mods_path]:
-                if mods_to_merge_path.exists():
-                    logger.info(
-                        f"[{env.name}][{world}] Copying '{mods_to_merge_path}' => '{mods_path}'"
-                    )
-                    shutil.copytree(
-                        mods_to_merge_path,
-                        mods_path,
-                        dirs_exist_ok=True,
-                        symlinks=True,  # Should we literally ever encounter symlinks lol
-                    )
-                else:
-                    logger.warning(
-                        f"Tried copying files from '{mods_to_merge_path}' but path did not exist!"
-                    )
+        filename = None
+        mod_dl_url = None
+        with requests.get(fabric_proxy_url) as r:
+            resp = r.json()
+            if len(resp) == 0:
+                raise RuntimeError("Modrinth API returned no valid downloads for the FabricProxy-Lite mod!")
+
+            project_version_data = resp[0]
+            if "files" not in project_version_data:
+                raise RuntimeError("Got malformed response from Modrinth! Expected a 'files' field in the project version data!")
+
+            file_data = project_version_data["files"]
+            if "url" not in file_data:
+                raise RuntimeError("Got malformed response from Modrinth! Expected a 'url' field in the project download file data!")
+            if "filename" not in file_data:
+                raise RuntimeError("Got malformed response from Modrinth! Expected a 'filename' field in the project download file data!")
+
+            filename = file_data["filename"]
+            mod_dl_url = file_data["url"]
+
+        if mod_dl_url is None:
+            raise Exception("Somehow got here with a None mod download url!")
+
+        download_dest = ServerPaths.get()
+        urllib.request.urlretrieve(mod_dl_url, filename)
