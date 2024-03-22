@@ -18,7 +18,7 @@ __ENV_CONFIG: dict = {}
 
 
 def load_toml_config(
-    config_path: Optional[str] = None,
+    config_path: str,
     no_cache: bool = False,
 ) -> TomlConfig:
 
@@ -35,7 +35,7 @@ def load_toml_config(
 
 
 def load_env_config(
-    config_path: Optional[str] = None,
+    config_path: str,
     no_cache: bool = False,
 ) -> EnvConfig:
     global __ENV_CONFIG
@@ -47,7 +47,7 @@ def load_env_config(
 
 
 def load_yaml_config(
-    config_path: Optional[str] = None,
+    config_path: str,
     no_cache: bool = False,
 ) -> YamlConfig:
     global __YAML_CONFIG
