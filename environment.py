@@ -119,7 +119,7 @@ class Env:
         Returns:
             str: Formatted string identifying the env.
         """
-        return f"Env {self.num} - {self.alias.capitalize()}"
+        return f"Env {self.num} - {self.alias}"
 
     @property
     def world_groups(self) -> List[str]:
