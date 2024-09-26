@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from src.common.types import DataDirType
+from src.common.types import DataDirType, GeneratedFileType
 from src.common.constants import BASE_DATA_PATH, HOST_REPO_ROOT_PATH, REPO_ROOT_PATH, RESTIC_REPO_PATH
 
 
@@ -9,9 +9,15 @@ class ServerPaths:
     ##
     ## Repo based directory helpers
     ##
+    GEN_FILE_TYPE_TO_PATH_MAPPING = {
+        GeneratedFileType.VELOCITY_TOML: "velocity",
+        GeneratedFileType.DOCKER_COMPOSE_TOML: "docker-compose",
+        GeneratedFileType.ENV_TOML: "env-toml",
+        GeneratedFileType.ENV_FILES: "env-files",
+    }
 
     @staticmethod
-    def get_generated_configs_path() -> Path:
+    def get_generated_configs_path(type: GeneratedFileType) -> Path:
         """Get the path we dump all env-based generated files
 
         Equivalent to `{constants.REPO_ROOT_PATH}/gen`
@@ -21,18 +27,18 @@ class ServerPaths:
         Returns:
             Path: Generated files path
         """
-        return REPO_ROOT_PATH / "gen"
+        return REPO_ROOT_PATH / "gen" / ServerPaths.GEN_FILE_TYPE_TO_PATH_MAPPING[type]
 
     @staticmethod
     def get_env_toml_config_dir_path() -> Path:
         """Get the path we expect the env toml configs to be in
 
-        Equivalent to `{constants.REPO_ROOT_PATH}/env`
+        Equivalent to `{constants.REPO_ROOT_PATH}/gen/env-toml`
 
         Returns:
             Path: Dir path where we keep our env tomls
         """
-        return REPO_ROOT_PATH / "env"
+        return ServerPaths.get_generated_configs_path(GeneratedFileType.ENV_TOML)
 
     @staticmethod
     def get_minecraft_db_env_file_path() -> Path:
@@ -331,7 +337,7 @@ class ServerPaths:
             Path: Generated `docker-compose-{env}.yml` path
         """
         return (
-            ServerPaths.get_generated_configs_path() / f"docker-compose-{env_str}.yml"
+            ServerPaths.get_generated_configs_path(GeneratedFileType.DOCKER_COMPOSE_TOML) / f"docker-compose-{env_str}.yml"
         )
 
     @staticmethod
@@ -346,7 +352,7 @@ class ServerPaths:
         Returns:
             Path: Generated `{env}.env` path
         """
-        return ServerPaths.get_generated_configs_path() / f"{env_str}.env"
+        return ServerPaths.get_generated_configs_path(GeneratedFileType.ENV_FILES) / f"{env_str}.env"
 
     @staticmethod
     def get_generated_velocity_config_path(env_str: str) -> Path:
@@ -360,7 +366,7 @@ class ServerPaths:
         Returns:
             Path: Generated `velocity-{env}.toml` path
         """
-        return ServerPaths.get_generated_configs_path() / f"velocity-{env_str}.toml"
+        return ServerPaths.get_generated_configs_path(GeneratedFileType.VELOCITY_TOML) / f"velocity-{env_str}.toml"
 
     ## Base data path based specific filepath helpers
 
