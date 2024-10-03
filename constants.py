@@ -3,7 +3,9 @@ import stat
 from pathlib import Path
 from typing import Any
 
-BASE_DATA_PATH = Path("/var/lib/yukkuricraft")
+BASE_DATA_PATH = Path(
+    os.getenv("MC_FS_ROOT", "/couldnotfindvalidminecraftfilesystemroot")
+)
 REPO_ROOT_PATH = Path(__file__).parent.parent.parent  # G w o s s
 HOST_REPO_ROOT_PATH = Path(
     os.getenv("HOST_YC_REPO_ROOT", "/couldnotfindavalidhostrepopath/")
