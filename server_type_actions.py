@@ -68,9 +68,7 @@ class ServerTypeActions:
                 curr_dir.parent / "generator" / PAPER_GLOBAL_TEMPLATE_PATH
             )
         else:
-            paper_global_tpl = load_yaml_config(
-                str(paper_global_yml_path), "/"
-            )
+            paper_global_tpl = load_yaml_config(str(paper_global_yml_path), "/")
         paper_global_config = paper_global_tpl.as_dict()
         paper_global_config["proxies"]["velocity"][
             "secret"
@@ -99,11 +97,15 @@ class ServerTypeActions:
         # At best it's a no op, at worst we overwrite changes.
         dest_bukkit_yml_path = ServerPaths.get_bukkit_yml_path(target_env.name)
         if not dest_bukkit_yml_path.exists():
-            logger.info(f"Writing 'bukkit.yml' to 'defaultconfigs' for env: '{target_env.name}'")
+            logger.info(
+                f"Writing 'bukkit.yml' to 'defaultconfigs' for env: '{target_env.name}'"
+            )
 
             # TODO: ServerPaths? Relies on a non-common const though. Do we move them all to common?
             curr_dir = Path(__file__).parent
-            template_path = curr_dir.parent / "generator" / "templates" / "bukkit.tpl.yml"
+            template_path = (
+                curr_dir.parent / "generator" / "templates" / "bukkit.tpl.yml"
+            )
 
             shutil.copy(
                 template_path,
@@ -111,6 +113,7 @@ class ServerTypeActions:
             )
 
     fabric_proxy_url_fmt = "https://api.modrinth.com/v2/project/8dI2tmqs/version?game_versions=[{mc_version}]&loaders=[{loader}]"
+
     def write_fabric_proxy_files(self, env: Env):
         """Downloads the appropriate Velocity/mcproxy related helper mods into the `server_only_mods` dir for `env`
 
@@ -130,17 +133,28 @@ class ServerTypeActions:
             logger.info(fabric_proxy_url)
             logger.info(pformat(resp))
             if len(resp) == 0:
-                raise RuntimeError("Modrinth API returned no valid downloads for the FabricProxy-Lite mod!")
+                raise RuntimeError(
+                    "Modrinth API returned no valid downloads for the FabricProxy-Lite mod!"
+                )
 
             project_version_data = resp[0]
-            if "files" not in project_version_data or len(project_version_data["files"]) == 0:
-                raise RuntimeError("Got malformed response from Modrinth! Expected a 'files' field in the project version data!")
+            if (
+                "files" not in project_version_data
+                or len(project_version_data["files"]) == 0
+            ):
+                raise RuntimeError(
+                    "Got malformed response from Modrinth! Expected a 'files' field in the project version data!"
+                )
 
             file_data = project_version_data["files"][0]
             if "url" not in file_data:
-                raise RuntimeError("Got malformed response from Modrinth! Expected a 'url' field in the project download file data!")
+                raise RuntimeError(
+                    "Got malformed response from Modrinth! Expected a 'url' field in the project download file data!"
+                )
             if "filename" not in file_data:
-                raise RuntimeError("Got malformed response from Modrinth! Expected a 'filename' field in the project download file data!")
+                raise RuntimeError(
+                    "Got malformed response from Modrinth! Expected a 'filename' field in the project download file data!"
+                )
 
             filename = file_data["filename"]
             mod_dl_url = file_data["url"]

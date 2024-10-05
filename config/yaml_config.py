@@ -20,9 +20,7 @@ class YamlConfig(ConfigNode):
     data: Dict
     config_path: Path
 
-    def __init__(
-        self, config_path: Path
-    ):
+    def __init__(self, config_path: Path):
         self.config_path = config_path
 
         with open(self.config_path, "r") as f:

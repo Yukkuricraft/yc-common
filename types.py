@@ -1,11 +1,12 @@
 from typing import TypeVar
 from enum import Enum
 
+
 class GeneratedFileType(Enum):
     VELOCITY_TOML = "velocity_toml"
     DOCKER_COMPOSE_TOML = "docker_compose_toml"
-    ENV_TOML = "env_toml" # Main cluster configuration files - These files can be manually modified
-    ENV_FILES = "env_files" # Generated from the env toml to be used with docker compose and other tools - These are not manually modified
+    ENV_TOML = "env_toml"  # Main cluster configuration files - These files can be manually modified
+    ENV_FILES = "env_files"  # Generated from the env toml to be used with docker compose and other tools - These are not manually modified
 
     @staticmethod
     def from_str(label) -> "GeneratedFileType":

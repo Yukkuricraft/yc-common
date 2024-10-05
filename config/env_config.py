@@ -14,9 +14,7 @@ class EnvConfig(ConfigNode):
     data: Dict
     config_path: Path
 
-    def __init__(
-        self, config_path: Path
-    ):
+    def __init__(self, config_path: Path):
         self.config_path = config_path
 
         self.data = {}
