@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.common.types import DataDirType, GeneratedFileType
-from src.common.constants import BASE_DATA_PATH, HOST_REPO_ROOT_PATH, REPO_ROOT_PATH, RESTIC_REPO_PATH
+from src.common.constants import BASE_DATA_PATH, HOST_REPO_ROOT_PATH, REPO_ROOT_PATH
 
 
 class ServerPaths:
@@ -20,14 +20,18 @@ class ServerPaths:
     def get_generated_configs_path(type: GeneratedFileType) -> Path:
         """Get the path we dump all env-based generated files
 
-        Equivalent to `{constants.REPO_ROOT_PATH}/gen`
-
-        Think files like velocity configs, env files, docker compose files
+        Equivalent to `{constants.REPO_ROOT_PATH}/gen/(velocity|docker-compose|env-toml|env-files)`
 
         Returns:
             Path: Generated files path
         """
-        return REPO_ROOT_PATH / "gen" / ServerPaths.GEN_FILE_TYPE_TO_PATH_MAPPING[type]
+        return (
+            REPO_ROOT_PATH
+            / "gen"
+            / ServerPaths.GEN_FILE_TYPE_TO_PATH_MAPPING.get(
+                type, "INVALID_GENERATED_FILE_TYPE"
+            )
+        )
 
     @staticmethod
     def get_env_toml_config_dir_path() -> Path:
@@ -328,7 +332,7 @@ class ServerPaths:
     def get_env_toml_config_path(env_str: str) -> Path:
         """Get the toml config path for `env`.
 
-        Equivalent to `{constants.REPO_ROOT_PATH}/env/{env}.toml`
+        Equivalent to `{constants.REPO_ROOT_PATH}/gen/env-toml/{env}.toml`
 
         Args:
             env (env_str): Environment to get path for
@@ -342,7 +346,7 @@ class ServerPaths:
     def get_generated_docker_compose_path(env_str: str) -> Path:
         """Returns the `docker-compose-{env}.yml` path for a given `env`.
 
-        Equivalent to `{constants.REPO_ROOT_PATH}/gen/docker-compose-{env}.yml`
+        Equivalent to `{constants.REPO_ROOT_PATH}/gen/docker-compose/docker-compose-{env}.yml`
 
         Args:
             env (env_str): Environment to get path for
@@ -351,7 +355,10 @@ class ServerPaths:
             Path: Generated `docker-compose-{env}.yml` path
         """
         return (
-            ServerPaths.get_generated_configs_path(GeneratedFileType.DOCKER_COMPOSE_TOML) / f"docker-compose-{env_str}.yml"
+            ServerPaths.get_generated_configs_path(
+                GeneratedFileType.DOCKER_COMPOSE_TOML
+            )
+            / f"docker-compose-{env_str}.yml"
         )
 
     @staticmethod
@@ -366,13 +373,16 @@ class ServerPaths:
         Returns:
             Path: Generated `{env}.env` path
         """
-        return ServerPaths.get_generated_configs_path(GeneratedFileType.ENV_FILES) / f"{env_str}.env"
+        return (
+            ServerPaths.get_generated_configs_path(GeneratedFileType.ENV_FILES)
+            / f"{env_str}.env"
+        )
 
     @staticmethod
     def get_generated_velocity_config_path(env_str: str) -> Path:
         """Returns the `velocity-{env}.toml` path for a given `env`.
 
-        Equivalent to `{constants.REPO_ROOT_PATH}/gen/velocity-{env}.toml`
+        Equivalent to `{constants.REPO_ROOT_PATH}/gen/velocity/velocity-{env}.toml`
 
         Args:
             env (env_str): Environment to get config for
@@ -380,7 +390,10 @@ class ServerPaths:
         Returns:
             Path: Generated `velocity-{env}.toml` path
         """
-        return ServerPaths.get_generated_configs_path(GeneratedFileType.VELOCITY_TOML) / f"velocity-{env_str}.toml"
+        return (
+            ServerPaths.get_generated_configs_path(GeneratedFileType.VELOCITY_TOML)
+            / f"velocity-{env_str}.toml"
+        )
 
     ## Base data path based specific filepath helpers
 
@@ -427,13 +440,12 @@ class ServerPaths:
             Path: Server.properties path
         """
         return (
-            ServerPaths.get_server_configs_path(env_str, world_group) / "server.properties"
+            ServerPaths.get_server_configs_path(env_str, world_group)
+            / "server.properties"
         )
 
     @staticmethod
-    def get_bukkit_yml_path(
-        env_str: str, world_group: Optional[str] = None
-    ) -> Path:
+    def get_bukkit_yml_path(env_str: str, world_group: Optional[str] = None) -> Path:
         """Returns the `bukkit.yml` path for a given `env` and optional `world_group`
 
         If `world_group` supplied:
@@ -448,10 +460,7 @@ class ServerPaths:
         Returns:
             Path: 'bukkit.yml' path
         """
-        return (
-            ServerPaths.get_server_configs_path(env_str, world_group) / "bukkit.yml"
-        )
-
+        return ServerPaths.get_server_configs_path(env_str, world_group) / "bukkit.yml"
 
     @staticmethod
     def get_paper_global_yml_path(
@@ -473,5 +482,7 @@ class ServerPaths:
         """
 
         return (
-            ServerPaths.get_server_configs_path(env_str, world_group) / "config" / "paper-global.yml"
+            ServerPaths.get_server_configs_path(env_str, world_group)
+            / "config"
+            / "paper-global.yml"
         )
