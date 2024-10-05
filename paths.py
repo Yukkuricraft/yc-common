@@ -104,6 +104,20 @@ class ServerPaths:
         return BASE_DATA_PATH / "env" / env_str
 
     @staticmethod
+    def get_velocity_plugins_path(env_str: str) -> Path:
+        """Get the velocity plugin path for a given `env`
+
+        Equivalent to `{constants.BASE_DATA_PATH}/env/{env}/velocity/plugins`
+
+        Args:
+            env (env_str): Environment
+
+        Returns:
+            Path: Velocity plugins path for `env`
+        """
+        return ServerPaths.get_env_data_path(env_str) / "velocity" / "plugins"
+
+    @staticmethod
     def get_mysql_env_data_path(env_str: str) -> Path:
         """Get the base mysql data path for a given `env`.
 
