@@ -8,8 +8,8 @@ from src.common.config import load_toml_config
 from src.common.config.config_node import ConfigNode
 from src.common.helpers import log_exception
 from src.common.logger_setup import logger
-from src.common.paths import ServerPaths
 from src.common.types import ServerTypes
+from src.common import server_paths
 
 
 class InvalidPortException(Exception):
@@ -161,7 +161,7 @@ class Env:
 
         try:
             self.config = load_toml_config(
-                ServerPaths.get_env_toml_config_path(self.env_str), no_cache=True
+                server_paths.get_env_toml_config_path(self.env_str), no_cache=True
             )
         except:
             log_exception(
@@ -199,7 +199,7 @@ class Env:
         Returns:
             bool: Whether env exists or not.
         """
-        return ServerPaths.get_env_toml_config_path(env_str).exists()
+        return server_paths.get_env_toml_config_path(env_str).exists()
 
     def __eq__(self, other):
         return self.name == other.name

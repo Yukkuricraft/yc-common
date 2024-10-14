@@ -1,167 +1,164 @@
 #!/bin/env python3
-from pprint import pformat
-import requests
-import yaml  # type: ignore
 import shutil
 
 from pathlib import Path
-import urllib.request
 
 from src.common.helpers import log_exception, write_config
-from src.common.config import ConfigNode, load_yaml_config
-from src.common.config.config_finder import ConfigFinder
+from src.common.config import load_yaml_config
 from src.common.config.yaml_config import YamlConfig
-from src.common.constants import REPO_ROOT_PATH, VELOCITY_FORWARDING_SECRET_PATH
-from src.common.types import DataDirType, ServerTypes
-from src.common.paths import ServerPaths
+from src.common.constants import VELOCITY_FORWARDING_SECRET_PATH
 from src.common.logger_setup import logger
+from src.common import jar_utils, modrinth, server_paths
 
 from src.common.environment import Env
 
 from src.generator.constants import PAPER_GLOBAL_TEMPLATE_PATH
 
 
-class ServerTypeActions:
-    server_root: Path
+def perform_only_once_actions(target_env: Env):
+    """Performs ServerType based actions that are meant to be invoked only once, usually at env creation time.
 
-    def perform_only_once_actions(self, target_env: Env):
-        """Performs ServerType based actions that are meant to be invoked only once, usually at env creation time.
+    Args:
+        target_env (Env): Env to run against
+    """
+    logger.info("Performing 'only once' server type actions")
 
-        Args:
-            target_env (Env): Env to run against
-        """
-        logger.info("Performing 'only once' server type actions")
+    if target_env.server_type in ["PAPER", "BUKKIT"]:
+        write_paper_bukkit_configs(target_env)
+    else:
+        logger.info(
+            f"No special actions taken for server type: {target_env.server_type}"
+        )
 
-        if target_env.server_type in ["FABRIC", "FORGE"]:
-            self.write_fabric_proxy_files(target_env)
-        elif target_env.server_type in ["PAPER", "BUKKIT"]:
-            self.write_paper_bukkit_configs(target_env)
-        else:
-            logger.info(
-                f"No special actions taken for server type: {target_env.server_type}"
+
+def write_paper_bukkit_configs(target_env: Env):
+    logger.info(f"Writing paper/bukkit configs for env: '{target_env.name}'")
+
+    write_default_paper_global_yml_config(target_env)
+    write_default_bukkit_yml_config(target_env)
+
+
+def write_default_paper_global_yml_config(target_env: Env):
+    velocity_forwarding_secret = "CouldNotFindValidSecret?"
+    curr_dir = Path(__file__).parent
+
+    try:
+        with open(VELOCITY_FORWARDING_SECRET_PATH, "r") as f:
+            secret = f.read().strip()
+            velocity_forwarding_secret = (
+                secret if len(secret) > 0 else velocity_forwarding_secret
             )
+    except FileNotFoundError:
+        log_exception(message=f"Could not load {VELOCITY_FORWARDING_SECRET_PATH}")
 
-    def write_paper_bukkit_configs(self, target_env: Env):
-        logger.info(f"Writing paper/bukkit configs for env: '{target_env.name}'")
+    # TODO: Need a cleaner way to handle different dir prefixes
+    paper_global_yml_path = server_paths.get_paper_global_yml_path(target_env.name)
+    if not paper_global_yml_path.exists():
+        # TODO: server_paths? Relies on a non-common const though. Do we move them all to common?
+        paper_global_tpl = load_yaml_config(
+            curr_dir.parent / "generator" / PAPER_GLOBAL_TEMPLATE_PATH
+        )
+    else:
+        paper_global_tpl = load_yaml_config(str(paper_global_yml_path), "/")
+    paper_global_config = paper_global_tpl.as_dict()
+    paper_global_config["proxies"]["velocity"]["secret"] = velocity_forwarding_secret
 
-        self.write_default_paper_global_yml_config(target_env)
-        self.write_default_bukkit_yml_config(target_env)
+    write_config(
+        paper_global_yml_path,
+        paper_global_config,
+        (
+            "#\n"
+            "# This file is largely unmodified from paper defaults except for proxies.velocity values.\n"
+            "# Particularly, proxies.velocity.secret is set to the value in our velocity secrets file."
+            "#\n\n"
+        ),
+        YamlConfig.write_cb,
+    )
 
-    def write_default_paper_global_yml_config(self, target_env: Env):
-        velocity_forwarding_secret = "CouldNotFindValidSecret?"
+
+def write_default_bukkit_yml_config(target_env: Env):
+    """Writes the `bukkit.yml` file for a given target env
+
+    Args:
+        target_env (Env): Env to
+    """
+
+    # Because we don't actually dynamically inject any values into the template, don't do anything if file already exists.
+    # At best it's a no op, at worst we overwrite changes.
+    dest_bukkit_yml_path = server_paths.get_bukkit_yml_path(target_env.name)
+    if not dest_bukkit_yml_path.exists():
+        logger.info(
+            f"Writing 'bukkit.yml' to 'defaultconfigs' for env: '{target_env.name}'"
+        )
+
+        # TODO: server_paths? Relies on a non-common const though. Do we move them all to common?
         curr_dir = Path(__file__).parent
+        template_path = curr_dir.parent / "generator" / "templates" / "bukkit.tpl.yml"
 
-        try:
-            with open(VELOCITY_FORWARDING_SECRET_PATH, "r") as f:
-                secret = f.read().strip()
-                velocity_forwarding_secret = (
-                    secret if len(secret) > 0 else velocity_forwarding_secret
-                )
-        except FileNotFoundError:
-            log_exception(message=f"Could not load {VELOCITY_FORWARDING_SECRET_PATH}")
-
-        # TODO: Need a cleaner way to handle different dir prefixes
-        paper_global_yml_path = ServerPaths.get_paper_global_yml_path(target_env.name)
-        if not paper_global_yml_path.exists():
-            # TODO: ServerPaths? Relies on a non-common const though. Do we move them all to common?
-            paper_global_tpl = load_yaml_config(
-                curr_dir.parent / "generator" / PAPER_GLOBAL_TEMPLATE_PATH
-            )
-        else:
-            paper_global_tpl = load_yaml_config(str(paper_global_yml_path), "/")
-        paper_global_config = paper_global_tpl.as_dict()
-        paper_global_config["proxies"]["velocity"][
-            "secret"
-        ] = velocity_forwarding_secret
-
-        write_config(
-            paper_global_yml_path,
-            paper_global_config,
-            (
-                "#\n"
-                "# This file is largely unmodified from paper defaults except for proxies.velocity values.\n"
-                "# Particularly, proxies.velocity.secret is set to the value in our velocity secrets file."
-                "#\n\n"
-            ),
-            YamlConfig.write_cb,
+        shutil.copy(
+            template_path,
+            dest_bukkit_yml_path,
         )
 
-    def write_default_bukkit_yml_config(self, target_env: Env):
-        """Writes the `bukkit.yml` file for a given target env
 
-        Args:
-            target_env (Env): Env to
-        """
+def write_fabric_proxy_files(env: Env):
+    """Downloads the appropriate Velocity/mcproxy related helper mods into the `server_only_mods` dir for `env`
 
-        # Because we don't actually dynamically inject any values into the template, don't do anything if file already exists.
-        # At best it's a no op, at worst we overwrite changes.
-        dest_bukkit_yml_path = ServerPaths.get_bukkit_yml_path(target_env.name)
-        if not dest_bukkit_yml_path.exists():
-            logger.info(
-                f"Writing 'bukkit.yml' to 'defaultconfigs' for env: '{target_env.name}'"
-            )
+    Args:
+        env (Env): Env to target
+    """
 
-            # TODO: ServerPaths? Relies on a non-common const though. Do we move them all to common?
-            curr_dir = Path(__file__).parent
-            template_path = (
-                curr_dir.parent / "generator" / "templates" / "bukkit.tpl.yml"
-            )
+    fabric_proxy_version = env.cluster_vars.get("FABRIC_PROXY_VERSION", None)
+    if not fabric_proxy_version:
+        fabric_proxy_version = env.cluster_vars.get("MC_VERSION", "no-mc-version-found")
 
-            shutil.copy(
-                template_path,
-                dest_bukkit_yml_path,
-            )
-
-    fabric_proxy_url_fmt = "https://api.modrinth.com/v2/project/8dI2tmqs/version?game_versions=[{mc_version}]&loaders=[{loader}]"
-
-    def write_fabric_proxy_files(self, env: Env):
-        """Downloads the appropriate Velocity/mcproxy related helper mods into the `server_only_mods` dir for `env`
-
-        Args:
-            env (Env): Env to target
-        """
-
-        fabric_proxy_url = self.fabric_proxy_url_fmt.format(
-            mc_version=f'"{env.cluster_vars.get("MC_VERSION", "no-mc-version-found")}"',
-            loader=f'"{env.cluster_vars.get("MC_TYPE", "invalid-server-type").lower()}"',
+    jar_path = get_proxy_jar_path(env)
+    if not jar_path:
+        logger.info("Could not find an existing FabricProxy-Lite. Downloading now.")
+        download_fabric_proxy_files(env, fabric_proxy_version)
+    elif not is_proxy_jar_correct_version(jar_path, env, fabric_proxy_version):
+        logger.info(
+            "Found an existing FabricProxy-Lite with incorrect version. Deleting and redownloading correct version."
         )
+        jar_path.unlink()
+        download_fabric_proxy_files(env, fabric_proxy_version)
+    else:
+        logger.info("Found an existing FabricProxy-Lite with correct version.")
 
-        filename = None
-        mod_dl_url = None
-        with requests.get(fabric_proxy_url) as r:
-            resp = r.json()
-            logger.info(fabric_proxy_url)
-            logger.info(pformat(resp))
-            if len(resp) == 0:
-                raise RuntimeError(
-                    "Modrinth API returned no valid downloads for the FabricProxy-Lite mod!"
-                )
 
-            project_version_data = resp[0]
-            if (
-                "files" not in project_version_data
-                or len(project_version_data["files"]) == 0
-            ):
-                raise RuntimeError(
-                    "Got malformed response from Modrinth! Expected a 'files' field in the project version data!"
-                )
+def get_proxy_jar_path(env: Env) -> Path:
+    """Check if there already exists a fabric proxy file.
 
-            file_data = project_version_data["files"][0]
-            if "url" not in file_data:
-                raise RuntimeError(
-                    "Got malformed response from Modrinth! Expected a 'url' field in the project download file data!"
-                )
-            if "filename" not in file_data:
-                raise RuntimeError(
-                    "Got malformed response from Modrinth! Expected a 'filename' field in the project download file data!"
-                )
+    If exists, returns a Path object to the jar
+    Else, returns None
+    """
+    proxy_file_path = server_paths.get_env_default_mods_path(env.name)
+    for file in proxy_file_path.iterdir():
+        if file.suffix != ".jar":
+            continue
+        if jar_utils.get_pluginmod_name(file) == "FabricProxy Lite":
+            return file
+    return None
 
-            filename = file_data["filename"]
-            mod_dl_url = file_data["url"]
 
-        if mod_dl_url is None:
-            raise Exception("Somehow got here with a None mod download url!")
+def is_proxy_jar_correct_version(
+    jar_path: Path, env: Env, fabric_proxy_version: str
+) -> bool:
+    """Check if the existing jar is the correct version
+    Note: Does not handle mods that have multiple files associated with it atm
+    """
+    loader = env.cluster_vars.get("MC_TYPE", "invalid-server-type").lower()
+    mod_info = modrinth.query_for_mod(
+        modrinth.FABRICPROXY_LITE_PROJECT_ID, fabric_proxy_version, loader
+    )
 
-        download_dest = ServerPaths.get_env_default_mods_path(env.name) / filename
-        logger.info(f">> Downloading from '{mod_dl_url}' to '{download_dest}'!")
-        urllib.request.urlretrieve(mod_dl_url, download_dest)
+    expected_version = mod_info["name"]
+    current_version = jar_utils.get_pluginmod_version(jar_path)
+
+    return expected_version == current_version
+
+
+def download_fabric_proxy_files(env: Env, fabric_proxy_version: str):
+    modrinth.download_mod(
+        modrinth.FABRICPROXY_LITE_PROJECT_ID, fabric_proxy_version, env
+    )
