@@ -1,6 +1,6 @@
 import re
 
-from typing import Dict, List
+from typing import List
 from pprint import pformat
 from functools import total_ordering
 

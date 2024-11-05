@@ -5,12 +5,34 @@ from typing import TextIO, List, Tuple, Dict, Optional, Any
 
 
 class ConfigNode:
+    """Represents a "node" within a config.
+
+    A ConfigNode is a recursive data structure representing an N-ary tree representing a config object.
+
+    Effectively, this means given a config object that looks like this:
+    {
+        "foo: "bar",
+        "baz": {
+            "qux": [
+                "quux",
+                "thud",
+            ],
+            "grunt": 0
+        }
+    }
+    We can access its contents like so:
+    - `root.foo` returns `"bar"`
+    - `root.baz` returns another ConfigNode representing `{"qux": ["quux", "thud"], "grunt": 0}`
+    - `root.baz.qux` returns `["quux", "thud"]`
+    - `root.baz.grunt` returns `0`
+    """
+
     data: Dict
 
     def __getattr__(self, name: str):
         """Allows accessing config node vals using attribute accessors (foo.bar)
 
-        If `name` is not found, also tries a hpyhenated version converting from underscores.
+        If `name` is not found, also tries a hyphenated version converting from underscores.
 
         Args:
             name (str): Config node name
