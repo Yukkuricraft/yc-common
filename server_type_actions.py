@@ -1,7 +1,7 @@
-#!/bin/env python3
 import shutil
 
 from pathlib import Path
+from typing import Optional
 
 from src.common.helpers import log_exception, write_config
 from src.common.config import load_yaml_config
@@ -39,6 +39,11 @@ def write_paper_bukkit_configs(target_env: Env):
 
 
 def write_default_paper_global_yml_config(target_env: Env):
+    """Writes the `paper-global.yml` file for a given target env
+
+    Args:
+        target_env (Env): The env to write `paper-global.yml` into.
+    """
     velocity_forwarding_secret = "CouldNotFindValidSecret?"
     curr_dir = Path(__file__).parent
 
@@ -80,7 +85,7 @@ def write_default_bukkit_yml_config(target_env: Env):
     """Writes the `bukkit.yml` file for a given target env
 
     Args:
-        target_env (Env): Env to
+        target_env (Env): The env to write `bukkit.yml` into.
     """
 
     # Because we don't actually dynamically inject any values into the template, don't do anything if file already exists.
@@ -126,12 +131,17 @@ def write_fabric_proxy_files(env: Env):
         logger.info("Found an existing FabricProxy-Lite with correct version.")
 
 
-def get_proxy_jar_path(env: Env) -> Path:
+def get_proxy_jar_path(env: Env) -> Optional[Path]:
     """Check if there already exists a fabric proxy file.
 
-    If exists, returns a Path object to the jar
-    Else, returns None
+    Args:
+        env (Env): Env to check
+
+    Returns:
+        Path: If exists, returns a Path object to the jar
+              Else, returns None
     """
+
     proxy_file_path = server_paths.get_env_default_mods_path(env.name)
     for file in proxy_file_path.iterdir():
         if file.suffix != ".jar":
@@ -144,12 +154,22 @@ def get_proxy_jar_path(env: Env) -> Path:
 def is_proxy_jar_correct_version(
     jar_path: Path, env: Env, fabric_proxy_version: str
 ) -> bool:
-    """Check if the existing jar is the correct version
-    Note: Does not handle mods that have multiple files associated with it atm
+    """Checks if the existing Fabric Proxy jar version in `env` matches the expected `fabric_proxy_version`.
+
+    Args:
+        jar_path (Path): Path to the FabricProxy jar
+        env (Env): The env this is in
+        fabric_proxy_version (str): The desired version of the Fabric Proxy
+
+    Returns:
+        bool: True if the existing jar version matches `fabric_proxy_version`. False otherwise.
     """
-    loader = env.cluster_vars.get("MC_TYPE", "invalid-server-type").lower()
     mod_info = modrinth.query_for_mod(
-        modrinth.FABRICPROXY_LITE_PROJECT_ID, fabric_proxy_version, loader
+        modrinth.PluginModDefinition(
+            modrinth.FABRICPROXY_LITE_PROJECT_ID,
+            fabric_proxy_version,
+            env=env,
+        )
     )
 
     expected_version = mod_info["name"]
@@ -159,6 +179,21 @@ def is_proxy_jar_correct_version(
 
 
 def download_fabric_proxy_files(env: Env, fabric_proxy_version: str):
+    """Wrapper around `modrinth.download_mod()` to download the Fabric proxy mod
+
+    Args:
+        env (Env): Env to install the mod into
+        fabric_proxy_version (str): The Fabric Proxy version to download. Should match a version listed on the Fabric Proxy modrinth page.
+    """
     modrinth.download_mod(
-        modrinth.FABRICPROXY_LITE_PROJECT_ID, fabric_proxy_version, env
+        modrinth.PluginModDefinition(
+            modrinth.FABRICPROXY_LITE_PROJECT_ID,
+            fabric_proxy_version,
+            env=env,
+        ),
+        env.name,
     )
+
+
+def download_modrinth_pluginmods() -> None:
+    pass
