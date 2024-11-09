@@ -24,7 +24,9 @@ HOST_REPO_ROOT_PATH = Path(
 Eg, /home/minecraft/Yukkuricraft/Yukkuricraft
 """
 
-RESTIC_REPO_PATH = Path("/media/backups-primary/restic")
+RESTIC_REPO_PATH = Path(
+    os.getenv("HOST_BACKUPS_ROOT", "/media/backups-primary/restic")
+)
 """Path to the Restic repo
 """
 
