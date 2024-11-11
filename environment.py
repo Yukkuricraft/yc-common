@@ -1,8 +1,10 @@
 import re
 
-from typing import List
+from typing import Dict, List
 from pprint import pformat
 from functools import total_ordering
+
+from pydantic import Field, BaseModel  # type: ignore
 
 from src.common.config import load_toml_config
 from src.common.config.config_node import ConfigNode
@@ -18,6 +20,19 @@ class InvalidPortException(Exception):
 
 class InvalidEnvException(Exception):
     pass
+
+
+class EnvModel(BaseModel):
+    config: Dict = Field(description="Cluster configuration for this environment")
+    name: str = Field(description="Container name this env is running as")
+    hostname: str = Field(description="Container hostname this env is running as")
+    description: str = Field(description="Description for this environment")
+    alias: str = Field(description="Short alias for this environment")
+    formatted: str = Field(description="Human readable formatted name")
+    enable_env_protection: bool = Field(
+        description="Whether to allow deletion of this environment or not"
+    )
+    port: int = Field(description="Port number that the MC proxy (Velocity) will use")
 
 
 @total_ordering
@@ -36,6 +51,7 @@ class Env:
         "alias": lambda self: self.alias,
         "formatted": lambda self: self.formatted,
         "enable_env_protection": lambda self: self.enable_env_protection,
+        "port": lambda self: self.proxy_port,
     }
 
     _config_node: ConfigNode
