@@ -25,7 +25,7 @@ Eg, /home/minecraft/Yukkuricraft/Yukkuricraft
 """
 
 RESTIC_REPO_PATH = Path(
-    os.getenv("HOST_BACKUPS_ROOT", "/media/backups-primary/restic")
+    os.getenv("HOST_RESTIC_ROOT", "/couldnotfindavalidresticrepopath")
 )
 """Path to the Restic repo
 """
