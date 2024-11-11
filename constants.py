@@ -66,3 +66,11 @@ YC_ENV_LABEL = "net.yukkuricraft.env"
 MC_DOCKER_CONTAINER_NAME_FMT = "YC-{env}-{name}"
 """Format string for docker container names
 """
+
+HOST_UID = os.getenv("HOST_UID", "NO_HOST_UID_PROVIDED")
+"""The UID of the host user running the API
+"""
+
+HOST_GID = os.getenv("HOST_GID", "NO_HOST_GID_PROVIDED")
+"""The GID of the host user running the API
+"""
