@@ -1,6 +1,7 @@
 import traceback
 import os
 
+from datetime import datetime, timezone
 from typing import Optional, Dict, Callable, Any
 from pprint import pformat
 from pathlib import Path
@@ -8,6 +9,10 @@ from pathlib import Path
 from src.common.constants import DEFAULT_CHMOD_MODE
 from src.common.config.toml_config import TomlConfig
 from src.common.logger_setup import logger
+
+
+def get_now_epoch() -> int:
+    return datetime.now(timezone.utc)
 
 
 def write_config(
