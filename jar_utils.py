@@ -15,13 +15,13 @@ class BaseHandler:
 
 
 class JsonHandler(BaseHandler):
-    def __init__(self, file: Path):
+    def __init__(self, file: zipfile.Path):
         with file.open("r") as f:
             self.data = json.loads(f.read())
 
 
 class YamlHandler(BaseHandler):
-    def __init__(self, file: Path):
+    def __init__(self, file: zipfile.Path):
         with file.open("r") as f:
             self.data = yaml.load(f.read())
 

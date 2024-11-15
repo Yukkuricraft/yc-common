@@ -64,7 +64,7 @@ def write_default_paper_global_yml_config(target_env: Env):
             curr_dir.parent / "generator" / PAPER_GLOBAL_TEMPLATE_PATH
         )
     else:
-        paper_global_tpl = load_yaml_config(str(paper_global_yml_path), "/")
+        paper_global_tpl = load_yaml_config(paper_global_yml_path)
     paper_global_config = paper_global_tpl.as_dict()
     paper_global_config["proxies"]["velocity"]["secret"] = velocity_forwarding_secret
 

@@ -11,7 +11,7 @@ from src.common.config.toml_config import TomlConfig
 from src.common.logger_setup import logger
 
 
-def get_now_epoch() -> int:
+def get_now_dt() -> datetime:
     return datetime.now(timezone.utc)
 
 
@@ -19,7 +19,7 @@ def write_config(
     config_path: Path,
     config: Dict,
     header: str = "",
-    write_cb: Optional[Callable] = lambda f, config: TomlConfig.write_cb(f, config),
+    write_cb: Callable = lambda f, config: TomlConfig.write_cb(f, config),
 ):
     """Writes config to path with optional header and custom write cb
 
@@ -29,7 +29,7 @@ def write_config(
         config_path (Path): Path
         config (Dict): Config represented as a dict
         header (str, optional): Optional header. Defaults to "".
-        write_cb (Optional[Callable], optional): Defaults to a `toml_w.dump()`.
+        write_cb (Callable, optional): Defaults to a `toml_w.dump()`.
     """
 
     if not config_path.parent.exists():

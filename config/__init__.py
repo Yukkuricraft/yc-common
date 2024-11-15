@@ -18,7 +18,7 @@ __ENV_CONFIG: dict = {}
 
 
 def load_toml_config(
-    config_path: str,
+    config_path: Path,
     no_cache: bool = False,
 ) -> TomlConfig:
 
@@ -29,25 +29,25 @@ def load_toml_config(
         or __TOML_CONFIG[config_path] is None
         or no_cache
     ):
-        __TOML_CONFIG[config_path] = TomlConfig(config_path)
+        __TOML_CONFIG[config_path] = TomlConfig(Path(config_path))
 
     return __TOML_CONFIG[config_path]
 
 
 def load_env_config(
-    config_path: str,
+    config_path: Path,
     no_cache: bool = False,
 ) -> EnvConfig:
     global __ENV_CONFIG
 
     if config_path not in __ENV_CONFIG or __ENV_CONFIG[config_path] is None or no_cache:
-        __ENV_CONFIG[config_path] = EnvConfig(config_path)
+        __ENV_CONFIG[config_path] = EnvConfig(Path(config_path))
 
     return __ENV_CONFIG[config_path]
 
 
 def load_yaml_config(
-    config_path: str,
+    config_path: Path,
     no_cache: bool = False,
 ) -> YamlConfig:
     global __YAML_CONFIG
@@ -57,6 +57,6 @@ def load_yaml_config(
         or __YAML_CONFIG[config_path] is None
         or no_cache
     ):
-        __YAML_CONFIG[config_path] = YamlConfig(config_path)
+        __YAML_CONFIG[config_path] = YamlConfig(Path(config_path))
 
     return __YAML_CONFIG[config_path]

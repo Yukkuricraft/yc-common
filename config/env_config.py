@@ -51,6 +51,6 @@ class EnvConfig(ConfigNode):
         logger.debug(pformat(config))
         for key, value in config.items():
             if quote:
-                f.write(f'{key}="{value}"\n'.encode("utf8"))
+                f.write(f'{key}="{value}"\n')
             else:
-                f.write(f"{key}={value}\n".encode("utf8"))
+                f.write(f"{key}={value}\n")

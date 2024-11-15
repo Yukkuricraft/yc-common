@@ -1,6 +1,6 @@
 import re
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 from pprint import pformat
 from functools import total_ordering
 
@@ -117,7 +117,7 @@ class Env:
         return self.cluster_vars.get("VELOCITY_PORT", "")
 
     @property
-    def server_type(self) -> ServerTypes:
+    def server_type(self) -> str:
         """Returns the Minecraft server type
 
         Returns:
@@ -161,6 +161,8 @@ class Env:
         """
         return self.config.general.get("enable_env_protection", False)
 
+    num: Optional[int]
+
     def __init__(self, env_str: str):
         if not self.is_valid_env(env_str):
             raise InvalidEnvException()
@@ -203,7 +205,7 @@ class Env:
         Returns:
             bool: Whether env name is valid.
         """
-        return re.match("env\d+", env_str) is not None
+        return re.match(r"env\d+", env_str) is not None
 
     @classmethod
     def env_exists(cls, env_str: str) -> bool:

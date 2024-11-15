@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
-import requests  # type: ignore
+import requests
 import urllib.request
 
 from pprint import pformat
