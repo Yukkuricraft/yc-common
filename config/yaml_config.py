@@ -49,5 +49,5 @@ class YamlConfig(ConfigNode):
                 config,
                 default_flow_style=False,
                 sort_keys=False,
-            ).encode("utf8")
+            ).encode("utf8"),
         )

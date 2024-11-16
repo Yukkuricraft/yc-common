@@ -2,11 +2,9 @@
 
 from typing import TextIO, Dict, Optional
 from pathlib import Path
-from configparser import ConfigParser
 from pprint import pprint, pformat
 
 from src.common.config.config_node import ConfigNode
-from src.common.config.config_finder import ConfigFinder
 from src.common.logger_setup import logger
 
 
@@ -51,6 +49,6 @@ class EnvConfig(ConfigNode):
         logger.debug(pformat(config))
         for key, value in config.items():
             if quote:
-                f.write(f'{key}="{value}"\n')
+                f.write(f'{key}="{value}"\n'.encode("utf8"))
             else:
-                f.write(f"{key}={value}\n")
+                f.write(f"{key}={value}\n".encode("utf8"))
