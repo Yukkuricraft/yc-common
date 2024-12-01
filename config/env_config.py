@@ -4,20 +4,19 @@ from typing import TextIO, Dict, Optional
 from pathlib import Path
 from pprint import pprint, pformat
 
+from src.common.helpers import log_exception
 from src.common.config.config_node import ConfigNode
 from src.common.logger_setup import logger
 
 
 class EnvConfig(ConfigNode):
     data: Dict
-    config_path: Path
 
-    def __init__(self, config_path: Path):
-        self.config_path = config_path
-
+    def __init__(self, config_content: str):
         self.data = {}
-        with open(self.config_path, "r") as f:
-            for line in f.readlines():
+
+        try:
+            for line in config_content.split("\n"):
                 line = line.strip()
                 if not line:
                     continue
@@ -28,6 +27,8 @@ class EnvConfig(ConfigNode):
                 )  # Just incase there were any ='s in the vals...? Is that even valid syntax?
 
                 self.data[key] = val
+        except:
+            log_exception()
 
         if self.data == None:
             self.data = {}

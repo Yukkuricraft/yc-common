@@ -11,6 +11,7 @@ yaml.SafeDumper.add_representer(
     lambda dumper, value: dumper.represent_scalar("tag:yaml.org,2002:null", ""),
 )
 
+from src.common.helpers import log_exception
 from src.common.config.config_node import ConfigNode
 from src.common.config.config_finder import ConfigFinder
 from src.common.logger_setup import logger
@@ -18,13 +19,13 @@ from src.common.logger_setup import logger
 
 class YamlConfig(ConfigNode):
     data: Dict
-    config_path: Path
 
-    def __init__(self, config_path: Path):
-        self.config_path = config_path
+    def __init__(self, config_content: str):
 
-        with open(self.config_path, "r") as f:
-            self.data = yaml.safe_load(f)
+        try:
+            self.data = yaml.safe_load(config_content)
+        except:
+            log_exception()
 
         if self.data == None:
             self.data = {}

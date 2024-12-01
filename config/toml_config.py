@@ -7,18 +7,19 @@ from pprint import pprint
 import toml  # type: ignore
 import tomli_w
 
+from src.common.helpers import log_exception
 from src.common.config.config_node import ConfigNode
 from src.common.config.config_finder import ConfigFinder
 
 
 class TomlConfig(ConfigNode):
     data: Dict
-    config_path: Path
 
-    def __init__(self, config_path: Path):
-        self.config_path = config_path
-        with open(self.config_path, "r") as f:
-            self.data = toml.loads(f.read())
+    def __init__(self, config_content: str):
+        try:
+            self.data = toml.loads(config_content)
+        except:
+            log_exception()
 
         if self.data is None:
             self.data = {}

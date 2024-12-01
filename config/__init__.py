@@ -29,7 +29,11 @@ def load_toml_config(
         or __TOML_CONFIG[config_path] is None
         or no_cache
     ):
-        __TOML_CONFIG[config_path] = TomlConfig(Path(config_path))
+        try:
+            with open(config_path, "r") as f:
+                __TOML_CONFIG[config_path] = TomlConfig(f.read())
+        except:
+            log_exception()
 
     return __TOML_CONFIG[config_path]
 
@@ -41,7 +45,11 @@ def load_env_config(
     global __ENV_CONFIG
 
     if config_path not in __ENV_CONFIG or __ENV_CONFIG[config_path] is None or no_cache:
-        __ENV_CONFIG[config_path] = EnvConfig(Path(config_path))
+        try:
+            with open(config_path, "r") as f:
+                __ENV_CONFIG[config_path] = EnvConfig(f.read())
+        except:
+            log_exception()
 
     return __ENV_CONFIG[config_path]
 
@@ -57,6 +65,10 @@ def load_yaml_config(
         or __YAML_CONFIG[config_path] is None
         or no_cache
     ):
-        __YAML_CONFIG[config_path] = YamlConfig(Path(config_path))
+        try:
+            with open(config_path, "r") as f:
+                __YAML_CONFIG[config_path] = YamlConfig(f.read())
+        except:
+            log_exception()
 
     return __YAML_CONFIG[config_path]
