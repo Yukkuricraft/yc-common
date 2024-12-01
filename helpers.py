@@ -7,7 +7,6 @@ from pprint import pformat
 from pathlib import Path
 
 from src.common.constants import DEFAULT_CHMOD_MODE
-from src.common.config.toml_config import TomlConfig
 from src.common.logger_setup import logger
 
 
@@ -18,8 +17,8 @@ def get_now_dt() -> datetime:
 def write_config(
     config_path: Path,
     config: Dict,
+    write_cb: Callable,
     header: str = "",
-    write_cb: Callable = lambda f, config: TomlConfig.write_cb(f, config),
 ):
     """Writes config to path with optional header and custom write cb
 

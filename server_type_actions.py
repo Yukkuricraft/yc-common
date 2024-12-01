@@ -102,13 +102,13 @@ def write_default_paper_global_yml_config(target_env: Env):
     write_config(
         paper_global_yml_path,
         paper_global_config,
+        YamlConfig.write_cb,
         (
             "#\n"
             "# This file is largely unmodified from paper defaults except for proxies.velocity values.\n"
             "# Particularly, proxies.velocity.secret is set to the value in our velocity secrets file."
             "#\n\n"
         ),
-        YamlConfig.write_cb,
     )
 
 
