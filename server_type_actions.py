@@ -1,5 +1,7 @@
 import shutil
 
+import requests
+
 from pathlib import Path
 from typing import Optional
 
@@ -34,8 +36,40 @@ def perform_only_once_actions(target_env: Env):
 def write_paper_bukkit_configs(target_env: Env):
     logger.info(f"Writing paper/bukkit configs for env: '{target_env.name}'")
 
-    write_default_paper_global_yml_config(target_env)
+    if target_env.server_version >= "1.19":
+        # Versions before 1.19 did not have a paper-global.yml
+        write_default_paper_global_yml_config(target_env)
+
     write_default_bukkit_yml_config(target_env)
+
+
+MINIMUM_VERSION_FOR_PAPER_GLOBAL = "1.19"
+default_configs_repo_url_fmt = "https://raw.githubusercontent.com/dayyeeet/minecraft-default-configs/refs/heads/main/{server_version}"
+default_paper_global_url_fmt = f"{default_configs_repo_url_fmt}/paper-global.yml"
+default_paper_world_defaults_url_fmt = (
+    f"{default_configs_repo_url_fmt}/paper-world-defaults.yml"
+)
+
+
+def get_paper_global_template_content(target_env: Env):
+    """Gets the content of the default or template paper-global.yml file
+
+    Args:
+        target_env (Env): The env to create paper-global.yml for.
+
+    Raises:
+        RuntimeError: If supplied `target_env`'s server version is too low
+    """
+    if target_env.server_version < MINIMUM_VERSION_FOR_PAPER_GLOBAL:
+        raise RuntimeError(
+            f"Tried getting default paper-global.yml file for a version that doesn't have that file! Got '{target_env.server_version}'"
+        )
+
+    default_paper_global_url = default_paper_global_url_fmt.format(
+        server_version=target_env.server_version
+    )
+    with requests.get(default_paper_global_url) as r:
+        return r.text
 
 
 def write_default_paper_global_yml_config(target_env: Env):
@@ -56,18 +90,15 @@ def write_default_paper_global_yml_config(target_env: Env):
     except FileNotFoundError:
         log_exception(message=f"Could not load {VELOCITY_FORWARDING_SECRET_PATH}")
 
-    # TODO: Need a cleaner way to handle different dir prefixes
-    paper_global_yml_path = server_paths.get_paper_global_yml_path(target_env.name)
-    if not paper_global_yml_path.exists():
-        # TODO: server_paths? Relies on a non-common const though. Do we move them all to common?
-        paper_global_tpl = load_yaml_config(
-            curr_dir.parent / "generator" / PAPER_GLOBAL_TEMPLATE_PATH
-        )
-    else:
-        paper_global_tpl = load_yaml_config(paper_global_yml_path)
+    paper_global_tpl = YamlConfig(get_paper_global_template_content(target_env))
     paper_global_config = paper_global_tpl.as_dict()
     paper_global_config["proxies"]["velocity"]["secret"] = velocity_forwarding_secret
+    paper_global_config["proxies"]["velocity"]["enabled"] = True
+    paper_global_config["proxies"]["velocity"][
+        "online-mode"
+    ] = False  # We use Velocity Modern Forwarding
 
+    paper_global_yml_path = server_paths.get_paper_global_yml_path(target_env.name)
     write_config(
         paper_global_yml_path,
         paper_global_config,

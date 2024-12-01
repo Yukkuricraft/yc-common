@@ -126,6 +126,15 @@ class Env:
         return self.cluster_vars.get("MC_TYPE", "")
 
     @property
+    def server_version(self) -> str:
+        """Returns the Minecraft server version
+
+        Returns:
+            str: Representing minecraft version. Eg, 1.18.1, 1.21.3, etc.
+        """
+        return self.cluster_vars.get("MC_VERSION", "")
+
+    @property
     def formatted(self) -> str:
         """A formatted name/string for the environment.
 
